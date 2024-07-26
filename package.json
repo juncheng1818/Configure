@@ -1,0 +1,24 @@
+{
+  "name": "configure",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "pinia": "^2.1.7",
+    "vue": "^3.4.31"
+  },
+  "devDependencies": {
+    "@vicons/fluent": "^0.12.0",
+    "@vicons/ionicons5": "^0.12.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "naive-ui": "^2.39.0",
+    "sass": "^1.77.8",
+    "vfonts": "^0.0.3",
+    "vite": "^5.3.4"
+  }
+}
