@@ -51,13 +51,8 @@ const setCanvasSize = () => {
 import { useDrag } from '../../hocks/useDrag.js';
 const { startDrag, onDrag, stopDrag } = useDrag(canvas, canvasStyle, isDragging, offset, props);
 
-const showContextMenu = (event) => {
-    const parentRect = canvas.value.parentElement.getBoundingClientRect();
-    const relativeX = event.clientX - parentRect.left;
-    const relativeY = event.clientY - parentRect.top;
-
-    contextMenu.value.showMenu(relativeX, relativeY);
-};
+import { useContextMenu } from '../../hocks/useContextMenu.js';
+const { showContextMenu } = useContextMenu(canvas, contextMenu);
 
 onMounted(() => {
     setCanvasSize()

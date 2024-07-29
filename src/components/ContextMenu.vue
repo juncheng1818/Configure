@@ -1,8 +1,6 @@
 <template>
     <div v-if="visible" :style="menuStyle" class="context-menu">
         <ul>
-            <li @click="menuAction('action1')">Action 1</li>
-            <li @click="menuAction('action2')">Action 2</li>
             <li @click="menuAction('characteristic')">属性</li>
         </ul>
     </div>
