@@ -18,13 +18,12 @@ const left = ref('10px')
 const dashboard_ref = ref(null)
 
 const dashboardClick = (event) => {
-    console.log(iconChoice.name)
     const rect = dashboard_ref.value.getBoundingClientRect();
     // 计算相对位置
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     // 更新相对点击坐标
-    console.log(`Relative X: ${x}, Relative Y: ${y}`);
+    // console.log(`Relative X: ${x}, Relative Y: ${y}`);
 }
 
 </script>

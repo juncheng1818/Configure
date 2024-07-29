@@ -1,15 +1,18 @@
 <template>
-    <div id="rectangle">
+    <div id="rectangle" @mousedown="startDrag" @mousemove="onDrag" @mouseup="stopDrag">
         <canvas ref="canvas" :style="canvasStyle"></canvas>
     </div>
 </template>
 
 <script setup lang="js">
-import { ref, onMounted, onBeforeUnmount, defineProps } from 'vue';
+import { ref, onMounted, onBeforeUnmount, defineProps, reactive } from 'vue';
 
 const canvas = ref(null);
+const isDragging = ref(false);
+const offset = reactive({ x: 0, y: 0 });
+
 const props = defineProps({
-    position:{
+    position: {
         type: String,
         default: 'absolute'
     },
@@ -23,8 +26,9 @@ const props = defineProps({
     },
 })
 
-const canvasStyle = ref({
+const canvasStyle = reactive({
     position: props.position,
+    border: '1px solid black',
     top: props.top,
     left: props.left,
 });
@@ -36,10 +40,48 @@ const setCanvasSize = () => {
         canvasElement.height = 50;
         const ctx = canvasElement.getContext('2d');
 
-        ctx.fillStyle = 'blue';
+        ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, 100, 50);
     }
 };
+
+/**
+ * 拖拽相关
+*/
+
+const startDrag = (event) => {
+    isDragging.value = true;
+    offset.x = event.clientX - canvasStyle.left.replace('px', '');
+    offset.y = event.clientY - canvasStyle.top.replace('px', '');
+};
+
+const onDrag = (event) => {
+    if (!isDragging.value) return;
+
+    //获取整个父组件元素
+    const parent = canvas.value.parentElement;
+    const parentRect = parent.getBoundingClientRect();
+
+    let newLeft = event.clientX - offset.x;
+    let newTop = event.clientY - offset.y;
+
+    if (newLeft < 0) newLeft = 0;
+    if (newTop < 0) newTop = 0;
+    if (newLeft + props.width > parentRect.width) newLeft = parentRect.width - props.width;
+    if (newTop + props.height > parentRect.height) newTop = parentRect.height - props.height;
+
+    canvasStyle.left = `${newLeft}px`;
+    canvasStyle.top = `${newTop}px`;
+};
+
+const stopDrag = () => {
+    isDragging.value = false;
+};
+
+
+/**
+ * 拖拽结束
+ * */
 
 onMounted(() => {
     setCanvasSize();
@@ -50,5 +92,9 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-#rectangle {}
+#rectangle {
+    width: auto;
+    height: auto;
+    cursor: pointer;
+}
 </style>
