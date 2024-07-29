@@ -38,7 +38,7 @@ const addComponent = (event) => {
         leftIconList.clearIconFalse()
         message.success('组件添加成功')
     } else {
-        message.warning('请选择组件')
+        // message.warning('请选择组件')
     }
 }
 

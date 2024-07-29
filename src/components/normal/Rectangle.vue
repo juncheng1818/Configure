@@ -1,8 +1,8 @@
 <template>
     <div id="rectangle" @mousedown.stop="startDrag" @mousemove.stop="onDrag" @mouseup.stop="stopDrag"
-        @contextmenu.prevent="showContextMenu">
+        @contextmenu.prevent.stop="showContextMenu">
         <canvas ref="canvas" :style="canvasStyle"></canvas>
-        <ContextMenu ref="contextMenu" />
+        <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="canvasStyle"/>
     </div>
 </template>
 
@@ -16,10 +16,6 @@ const isDragging = ref(false);
 const offset = reactive({ x: 0, y: 0 });
 
 const props = defineProps({
-    position: {
-        type: String,
-        default: 'absolute'
-    },
     top: {
         type: String,
         default: '0px'
@@ -31,20 +27,23 @@ const props = defineProps({
 })
 
 const canvasStyle = reactive({
-    position: props.position,
+    position: 'absolute',
     border: '2px solid black',
     top: props.top,
     left: props.left,
+    width: '100px',
+    height: '50px',
+    backgroundColor: 'white',
 });
 
-const setCanvasSize = () => {
+const setCanvasSize = (backgroundColor,width,height) => {
     const canvasElement = canvas.value;
     if (canvasElement) {
-        canvasElement.width = 100;
-        canvasElement.height = 50;
+        canvasElement.width = width;
+        canvasElement.height = height;
         const ctx = canvasElement.getContext('2d');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, 100, 50);
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, width, height);
     }
 };
 
@@ -54,8 +53,17 @@ const { startDrag, onDrag, stopDrag } = useDrag(canvas, canvasStyle, isDragging,
 import { useContextMenu } from '../../hocks/useContextMenu.js';
 const { showContextMenu } = useContextMenu(canvas, contextMenu);
 
+const updateCss = (css) => {
+    console.log('孙组件Drawer传过来的数据',css);
+    canvasStyle.top = css.top;
+    canvasStyle.left = css.left;
+    canvasStyle.width = css.width;
+    canvasStyle.height = css.height;
+    setCanvasSize(canvasStyle.backgroundColor, canvasStyle.width, canvasStyle.height);
+};
+
 onMounted(() => {
-    setCanvasSize()
+    setCanvasSize(canvasStyle.backgroundColor, canvasStyle.width, canvasStyle.height);
 });
 
 onBeforeUnmount(() => {

@@ -4,11 +4,15 @@
             <li @click="menuAction('characteristic')">属性</li>
         </ul>
     </div>
+
+    <Drawer ref="drawer_ref" @update-css="updateCss"/>
 </template>
 
 <script setup lang="js">
-import { ref, reactive } from 'vue';
+import { ref, reactive ,defineEmits ,defineProps} from 'vue';
+import Drawer from './Drawer.vue';
 
+const drawer_ref = ref(null);
 const visible = ref(false);
 const menuStyle = reactive({
     position: 'absolute',
@@ -19,7 +23,16 @@ const menuStyle = reactive({
     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'
 });
 
-const showMenu = (x, y) => {
+const props = defineProps({
+    canvasStyle: {
+        type: Object,
+        default: () => {
+            return {}
+        }
+    }
+})
+
+const showMenu = (x, y, type) => {
     menuStyle.top = `${y}px`;
     menuStyle.left = `${x}px`;
     visible.value = true;
@@ -30,12 +43,18 @@ const hideMenu = () => {
 };
 
 const menuAction = (action) => {
-    console.log(`Action selected: ${action}`);
-    if(action === 'characteristic'){
-        console.log('show characteristic');
+    if (action === 'characteristic') {
+        drawer_ref.value.showDrawer(props.canvasStyle);
     }
     hideMenu();
 };
+
+const emit = defineEmits(['update-css']);
+
+const updateCss = (css) => {
+    emit('update-css', css);
+
+}
 
 document.addEventListener('click', hideMenu);
 defineExpose({ showMenu, hideMenu });
@@ -43,23 +62,22 @@ defineExpose({ showMenu, hideMenu });
 
 <style scoped lang="scss">
 .context-menu {
-  position: absolute;
-  z-index: 1000;
+    position: absolute;
+    z-index: 1000;
 }
 
 .context-menu ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 5px 0;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0;
 }
 
 .context-menu ul li {
-  padding: 5px 10px;
-  cursor: pointer;
+    padding: 5px 10px;
+    cursor: pointer;
 }
 
 .context-menu ul li:hover {
-  background-color: #eee;
+    background-color: #eee;
 }
-
 </style>
