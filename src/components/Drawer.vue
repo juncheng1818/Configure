@@ -16,8 +16,14 @@
                         <n-form-item label="高" path="height">
                             <n-input v-model:value="formValue.height" placeholder="请输入" />
                         </n-form-item>
+                        <n-form-item label="层级" path="height">
+                            <n-input v-model:value="formValue.zIndex" placeholder="请输入" />
+                        </n-form-item>
+                        <n-form-item label="背景色" path="backgroundColor">
+                            <n-color-picker v-model:value="formValue.backgroundColor" :show-alpha="false" />
+                        </n-form-item>
                         <n-form-item>
-                            <n-button attr-type="button" @click="handleValidateClick">
+                            <n-button type="primary" attr-type="button" @click="handleValidateClick">
                                 确定
                             </n-button>
                         </n-form-item>
@@ -31,7 +37,7 @@
 <script setup lang="js">
 
 import { ref, defineProps, defineEmits } from 'vue'
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NButton, NFlex } from 'naive-ui'
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NButton, NFlex ,NColorPicker} from 'naive-ui'
 const active = ref(false)
 const placement = ref('right')
 
@@ -39,7 +45,9 @@ const formValue = ref({
     left: 0,
     top: 0,
     width: 0,
-    height: 0
+    height: 0,
+    backgroundColor: '#fff',
+    zIndex: 0
 })
 
 const formRef = ref(null)
@@ -77,7 +85,9 @@ const showDrawer = (canvasStyle) => {
         left: canvasStyle.left,
         top: canvasStyle.top,
         width: canvasStyle.width,
-        height: canvasStyle.height
+        height: canvasStyle.height,
+        backgroundColor: canvasStyle.backgroundColor,
+        zIndex: canvasStyle.zIndex
     }
     active.value = true
 }

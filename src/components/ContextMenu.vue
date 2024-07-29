@@ -1,6 +1,7 @@
 <template>
     <div v-if="visible" :style="menuStyle" class="context-menu">
         <ul>
+            <li @click="menuAction('delete')">删除</li>
             <li @click="menuAction('characteristic')">属性</li>
         </ul>
     </div>
@@ -43,6 +44,9 @@ const hideMenu = () => {
 };
 
 const menuAction = (action) => {
+    if(action === 'delete'){
+        //删除，利用pinia，调用store中的方法
+    }
     if (action === 'characteristic') {
         drawer_ref.value.showDrawer(props.canvasStyle);
     }

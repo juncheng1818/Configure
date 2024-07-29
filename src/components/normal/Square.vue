@@ -2,6 +2,7 @@
     <div id="rectangle" @mousedown.capture="startDrag" @mousemove.capture="onDrag" @mouseup="stopDrag" @mouseleave="stopDrag"
         @contextmenu.prevent.stop="showContextMenu">
         <canvas ref="canvas" :style="canvasStyle"></canvas>
+        <!-- 鼠标右击的事件 -->
         <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="canvasStyle"/>
     </div>
 </template>
@@ -32,7 +33,7 @@ const canvasStyle = reactive({
     top: props.top,
     left: props.left,
     width: '100px',
-    height: '50px',
+    height: '100px',
     backgroundColor: '#ffffff',
     zIndex: 0
 });
