@@ -1,9 +1,12 @@
 <script setup>
 import Container from './views/container.vue'
+import { NMessageProvider } from 'naive-ui'
 </script>
 
 <template>
-  <Container />
+  <n-message-provider>
+    <Container />
+  </n-message-provider>
 </template>
 
 <style>

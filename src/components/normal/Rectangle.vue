@@ -1,13 +1,17 @@
 <template>
-    <div id="rectangle" @mousedown="startDrag" @mousemove="onDrag" @mouseup="stopDrag">
+    <div id="rectangle" @mousedown.stop="startDrag" @mousemove.stop="onDrag" @mouseup.stop="stopDrag"
+        @contextmenu.prevent="showContextMenu">
         <canvas ref="canvas" :style="canvasStyle"></canvas>
+        <ContextMenu ref="contextMenu" />
     </div>
 </template>
 
 <script setup lang="js">
 import { ref, onMounted, onBeforeUnmount, defineProps, reactive } from 'vue';
+import ContextMenu from '../ContextMenu.vue';
 
 const canvas = ref(null);
+const contextMenu = ref(null);
 const isDragging = ref(false);
 const offset = reactive({ x: 0, y: 0 });
 
@@ -28,7 +32,7 @@ const props = defineProps({
 
 const canvasStyle = reactive({
     position: props.position,
-    border: '1px solid black',
+    border: '2px solid black',
     top: props.top,
     left: props.left,
 });
@@ -83,8 +87,17 @@ const stopDrag = () => {
  * 拖拽结束
  * */
 
+
+const showContextMenu = (event) => {
+    const parentRect = canvas.value.parentElement.getBoundingClientRect();
+    const relativeX = event.clientX - parentRect.left;
+    const relativeY = event.clientY - parentRect.top;
+
+    contextMenu.value.showMenu(relativeX, relativeY);
+};
+
 onMounted(() => {
-    setCanvasSize();
+    setCanvasSize()
 });
 
 onBeforeUnmount(() => {
