@@ -27,7 +27,7 @@ const menuStyle = reactive({
     left: '0px',
     border: '1px solid #ccc',
     backgroundColor: 'white',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)'
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
 });
 
 const props = defineProps({
@@ -87,8 +87,10 @@ defineExpose({ showMenu, hideMenu });
 
 <style scoped lang="scss">
 .context-menu {
+    width: 80px;
     position: absolute;
     z-index: 1000;
+    text-align: center;
 }
 
 .context-menu ul {

@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 
-import { RectangleLandscape20Regular, Square20Regular } from '@vicons/fluent'
+import {
+    RectangleLandscape20Regular,
+    Square20Regular
+} from '@vicons/fluent'
 
 export const dashboardComponentStore = defineStore('dashboardComponent', {
     state: () => {
@@ -13,21 +16,6 @@ export const dashboardComponentStore = defineStore('dashboardComponent', {
     },
     actions: {
 
-        // 清空选择的组件
-        clearSelectComponent() {
-            this.selectComponent = null
-        },
-
-        //当前选择的组件
-        changeComponent(component) {
-            this.selectComponent = component
-        },
-
-        // 清空组件
-        clearComponentList() {
-            this.componentList = []
-        },
-
         // 删除组件
         deleteComponentList(id) {
             this.componentList = this.componentList.filter(item => item.id !== id)
@@ -38,10 +26,22 @@ export const dashboardComponentStore = defineStore('dashboardComponent', {
             this.componentList.push(component)
         },
 
+        //获取全部组件
         getComponentList() {
             return this.componentList
         },
 
+        //修改选中的组件
+        updateComponentList(id,componentStyle) {
+            this.componentList = this.componentList.map(item => {
+                if (item.id === id) {
+                    item = Object.assign(item,  componentStyle )
+                }
+                return item
+            })
+        },
+
+        //显示重置8个点位
         showResizable(id) {
             this.componentList = this.componentList.map(item => {
                 item.resizable = false
@@ -51,6 +51,8 @@ export const dashboardComponentStore = defineStore('dashboardComponent', {
                 return item
             })
         },
+
+        //清除8个点位
         claerResizable() {
             this.componentList = this.componentList.map(item => {
                 item.resizable = false
@@ -88,7 +90,7 @@ export const leftIconListStore = defineStore('leftIconList', {
             return this.iconList
         },
 
-        changeIcon(title,name) {
+        changeIcon(title, name) {
             this.iconList = this.iconList.map(item => {
                 if (item.title === title) {
                     item.normalIcon = item.normalIcon.map(item => {
@@ -102,7 +104,7 @@ export const leftIconListStore = defineStore('leftIconList', {
             })
         },
 
-        clearIconFalse(){
+        clearIconFalse() {
             this.iconList = this.iconList.map(item => {
                 item.normalIcon = item.normalIcon.map(item => {
                     item.choice = false

@@ -3,7 +3,7 @@
         <canvas ref="canvas" class="canvas-element" @mousedown.stop="startDrag" @mousemove.stop="onDrag"
             @mouseup="stopDrag" @mouseleave="stopDrag">
         </canvas>
-        <ResizeHandles v-if="props.resizable":offset="offset" :componentStyle="componentStyle" ref="resizeHandles_ref" />
+        <ResizeHandles v-if="props.resizable":offset="offset" :id="props.id" :componentStyle="componentStyle" ref="resizeHandles_ref" />
         <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="componentStyle" :id="props.id" />
     </div>
 </template>
@@ -17,6 +17,9 @@ const canvas = ref(null);
 const contextMenu = ref(null);
 const isDragging = ref(false);
 const offset = reactive({ x: 0, y: 0 });
+
+import { dashboardComponentStore }from '../../store/index.js'
+const dashboardComponent = dashboardComponentStore()
 
 const props = defineProps({
     id: {
@@ -77,6 +80,7 @@ const updateCss = (css) => {
     componentStyle.backgroundColor = css.backgroundColor;
     componentStyle.zIndex = css.zIndex;
     setCanvasSize(componentStyle.backgroundColor, componentStyle.width, componentStyle.height);
+    dashboardComponent.updateComponentList(props.id, componentStyle);
 };
 
 onMounted(() => {
@@ -86,8 +90,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
     document.removeEventListener('mousemove', onDrag);
     document.removeEventListener('mouseup', stopDrag);
-    document.removeEventListener('mousemove', onResize);
-    document.removeEventListener('mouseup', stopResize);
 });
 </script>
 

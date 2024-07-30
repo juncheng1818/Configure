@@ -18,6 +18,9 @@ const resizeDirection = ref('');
 const resizeHandles_ref = ref(null);
 let initialAngle = 0;
 
+import { dashboardComponentStore }from '../store/index.js'
+const dashboardComponent = dashboardComponentStore()
+
 const resizeHandles = [
     { position: 'top-left' },
     { position: 'top' },
@@ -30,6 +33,9 @@ const resizeHandles = [
 ];
 
 const props = defineProps({
+    id: {
+        type: String
+    },
     offset: {
         type: Object,
         default: () => {
@@ -87,6 +93,8 @@ const stopResize = () => {
     resizeDirection.value = '';
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mouseup', stopResize);
+
+    dashboardComponent.updateComponentList(props.id, props.componentStyle);
 };
 
 const startRotate = (event) => {
@@ -117,6 +125,7 @@ const stopRotate = () => {
     isRotating.value = false;
     document.removeEventListener('mousemove', onRotate);
     document.removeEventListener('mouseup', stopRotate);
+    dashboardComponent.updateComponentList(props.id, props.componentStyle);
 };
 
 </script>

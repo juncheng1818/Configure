@@ -1,15 +1,17 @@
 <template>
-    <div ref="canvasContainer" :style="componentStyle" class="canvas-container">
-        <canvas ref="canvas" class="canvas-element" :style="canvasStyle" @mousedown.capture="startDrag" @mousemove.capture="onDrag"
-            @mouseup="stopDrag" @mouseleave="stopDrag" @contextmenu.prevent="showContextMenu">
+    <div ref="canvasContainer" :style="componentStyle" class="canvas-container" @contextmenu.prevent="showContextMenu">
+        <canvas ref="canvas" class="canvas-element" @mousedown.stop="startDrag" @mousemove.stop="onDrag"
+            @mouseup="stopDrag" @mouseleave="stopDrag">
         </canvas>
-        <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="canvasStyle" :id="props.id" />
+        <ResizeHandles v-if="props.resizable":offset="offset" :componentStyle="componentStyle" ref="resizeHandles_ref" />
+        <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="componentStyle" :id="props.id" />
     </div>
 </template>
 
 <script setup lang="js">
 import { ref, onMounted, onBeforeUnmount, defineProps, reactive } from 'vue';
 import ContextMenu from '../ContextMenu.vue';
+import ResizeHandles from '../ResizeHandles.vue';
 
 const canvas = ref(null);
 const contextMenu = ref(null);
@@ -18,6 +20,12 @@ const offset = reactive({ x: 0, y: 0 });
 
 const props = defineProps({
     id: {
+        type: String
+    },
+    resizable: {
+        type: Boolean,
+    },
+    transform:{
         type: String
     },
     top: {
@@ -30,11 +38,13 @@ const props = defineProps({
     },
 })
 
+const canvasContainer = ref(null);
 const componentStyle = reactive({
     position: 'absolute',
     border: '2px solid black',
     top: props.top,
     left: props.left,
+    transform: props.transform,
     width: '100px',
     height: '100px',
     backgroundColor: '#ffffff',
@@ -83,14 +93,14 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .canvas-container {
-  position: absolute;
-  border: 1px solid black;
-  background-color: lightgrey;
+    position: absolute;
+    border: 1px solid black;
+    cursor: pointer;
 }
 
 .canvas-element {
-  width: 100%;
-  height: 100%;
-  display: block;
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 </style>
