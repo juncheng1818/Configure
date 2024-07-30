@@ -54,7 +54,6 @@ const startResize = (event, direction) => {
     resizeDirection.value = direction;
     props.offset.x = event.clientX;
     props.offset.y = event.clientY;
-
     document.addEventListener('mousemove', onResize);
     document.addEventListener('mouseup', stopResize);
 };
@@ -79,7 +78,6 @@ const onResize = (event) => {
         props.componentStyle.height = `${parseInt(props.componentStyle.height) - dy}px`;
         props.componentStyle.top = `${parseInt(props.componentStyle.top) + dy}px`;
     }
-
     props.offset.x = event.clientX;
     props.offset.y = event.clientY;
 };
@@ -87,7 +85,6 @@ const onResize = (event) => {
 const stopResize = () => {
     isResizing.value = false;
     resizeDirection.value = '';
-
     document.removeEventListener('mousemove', onResize);
     document.removeEventListener('mouseup', stopResize);
 };
@@ -101,14 +98,12 @@ const startRotate = (event) => {
     const radians = Math.atan2(event.clientY - centerY, event.clientX - centerX);
     console.log(props.componentStyle);
     initialAngle = (radians * 180) / Math.PI - parseFloat(props.componentStyle.transform.replace('rotate(', '').replace('deg)', ''));
-
     document.addEventListener('mousemove', onRotate);
     document.addEventListener('mouseup', stopRotate);
 };
 
 const onRotate = (event) => {
     if (!isRotating.value) return;
-
     const parent = resizeHandles_ref.value.parentElement;
     const rect = parent.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -120,7 +115,6 @@ const onRotate = (event) => {
 
 const stopRotate = () => {
     isRotating.value = false;
-
     document.removeEventListener('mousemove', onRotate);
     document.removeEventListener('mouseup', stopRotate);
 };
