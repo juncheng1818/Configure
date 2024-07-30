@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 
 import {
     RectangleLandscape20Regular,
-    Square20Regular
+    Square20Regular,
+    Star20Regular
 } from '@vicons/fluent'
 
 export const dashboardComponentStore = defineStore('dashboardComponent', {
@@ -77,6 +78,11 @@ export const leftIconListStore = defineStore('leftIconList', {
                         {
                             'name': 'Square',
                             'icon': Square20Regular,
+                            'choice': false
+                        },
+                        {
+                            'name': 'Star',
+                            'icon': Star20Regular,
                             'choice': false
                         },
                     ],

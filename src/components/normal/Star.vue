@@ -3,13 +3,13 @@
         <canvas ref="canvas" class="canvas-element" @mousedown.stop="startDrag" @mousemove.stop="onDrag"
             @mouseup="stopDrag" @mouseleave="stopDrag">
         </canvas>
-        <ResizeHandles v-if="props.resizable":offset="offset" :id="props.id" :componentStyle="componentStyle" ref="resizeHandles_ref" />
+        <ResizeHandles v-if="props.resizable" :offset="offset" :id="props.id" :componentStyle="componentStyle" ref="resizeHandles_ref" />
         <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="componentStyle" :id="props.id" />
     </div>
 </template>
 
 <script setup lang="js">
-import { ref, onMounted, onBeforeUnmount, defineProps, reactive } from 'vue';
+import { ref, onMounted, onBeforeUnmount, defineProps, reactive, watch } from 'vue';
 import ContextMenu from '../ContextMenu.vue';
 import ResizeHandles from '../ResizeHandles.vue';
 
@@ -18,8 +18,8 @@ const contextMenu = ref(null);
 const isDragging = ref(false);
 const offset = reactive({ x: 0, y: 0 });
 
-import { dashboardComponentStore }from '../../store/index.js'
-const dashboardComponent = dashboardComponentStore()
+import { dashboardComponentStore } from '../../store/index.js';
+const dashboardComponent = dashboardComponentStore();
 
 const props = defineProps({
     id: {
@@ -28,7 +28,7 @@ const props = defineProps({
     resizable: {
         type: Boolean,
     },
-    transform:{
+    transform: {
         type: String
     },
     top: {
@@ -39,29 +39,60 @@ const props = defineProps({
         type: String,
         default: '0px'
     },
-})
+});
 
 const canvasContainer = ref(null);
 const componentStyle = reactive({
     position: 'absolute',
-    border: '2px solid black',
+    border: 'none',
     top: props.top,
     left: props.left,
     transform: props.transform,
     width: '100px',
-    height: '50px',
+    height: '100px',
     backgroundColor: '#ffffff',
     zIndex: 0
 });
 
+const drawStar = (ctx, cx, cy, spikes, outerRadius, innerRadius) => {
+    let rot = Math.PI / 2 * 3;
+    let x = cx;
+    let y = cy;
+    let step = Math.PI / spikes;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - outerRadius);
+
+    for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy - Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy - Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+    }
+
+    ctx.lineTo(cx, cy - outerRadius);
+    ctx.closePath();
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+    ctx.fillStyle = 'white';
+    ctx.fill();
+};
+
 const setCanvasSize = (backgroundColor, width, height) => {
     const canvasElement = canvas.value;
     if (canvasElement) {
-        canvasElement.width = width;
-        canvasElement.height = height;
+        canvasElement.width = parseInt(width);
+        canvasElement.height = parseInt(height);
         const ctx = canvasElement.getContext('2d');
         ctx.fillStyle = backgroundColor;
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+        drawStar(ctx, canvasElement.width / 2, canvasElement.height / 2, 5, canvasElement.width / 2, canvasElement.width / 4);
     }
 };
 
