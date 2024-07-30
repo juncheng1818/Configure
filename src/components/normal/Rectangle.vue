@@ -1,14 +1,17 @@
 <template>
-    <div id="rectangle" @mousedown.capture="startDrag" @mousemove.capture="onDrag" @mouseup="stopDrag" @mouseleave="stopDrag"
-        @contextmenu.prevent.stop="showContextMenu">
-        <canvas ref="canvas" :style="canvasStyle"></canvas>
-        <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="canvasStyle"/>
+    <div ref="canvasContainer" :style="componentStyle" class="canvas-container" @contextmenu.prevent="showContextMenu">
+        <canvas ref="canvas" class="canvas-element" @mousedown.stop="startDrag" @mousemove.stop="onDrag"
+            @mouseup="stopDrag" @mouseleave="stopDrag">
+        </canvas>
+        <ResizeHandles v-if="props.resizable":offset="offset" :componentStyle="componentStyle" ref="resizeHandles_ref" />
+        <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="componentStyle" :id="props.id" />
     </div>
 </template>
 
 <script setup lang="js">
 import { ref, onMounted, onBeforeUnmount, defineProps, reactive } from 'vue';
 import ContextMenu from '../ContextMenu.vue';
+import ResizeHandles from '../ResizeHandles.vue';
 
 const canvas = ref(null);
 const contextMenu = ref(null);
@@ -16,6 +19,15 @@ const isDragging = ref(false);
 const offset = reactive({ x: 0, y: 0 });
 
 const props = defineProps({
+    id: {
+        type: String
+    },
+    resizable: {
+        type: Boolean,
+    },
+    transform:{
+        type: String
+    },
     top: {
         type: String,
         default: '0px'
@@ -26,18 +38,20 @@ const props = defineProps({
     },
 })
 
-const canvasStyle = reactive({
+const canvasContainer = ref(null);
+const componentStyle = reactive({
     position: 'absolute',
     border: '2px solid black',
     top: props.top,
     left: props.left,
+    transform: props.transform,
     width: '100px',
     height: '50px',
     backgroundColor: '#ffffff',
     zIndex: 0
 });
 
-const setCanvasSize = (backgroundColor,width,height) => {
+const setCanvasSize = (backgroundColor, width, height) => {
     const canvasElement = canvas.value;
     if (canvasElement) {
         canvasElement.width = width;
@@ -49,34 +63,44 @@ const setCanvasSize = (backgroundColor,width,height) => {
 };
 
 import { useDrag } from '../../hocks/useDrag.js';
-const { startDrag, onDrag, stopDrag } = useDrag(canvas, canvasStyle, isDragging, offset, props);
+const { startDrag, onDrag, stopDrag } = useDrag(canvas, componentStyle, isDragging, offset, props);
 
 import { useContextMenu } from '../../hocks/useContextMenu.js';
 const { showContextMenu } = useContextMenu(canvas, contextMenu);
 
 const updateCss = (css) => {
-    console.log('孙组件Drawer传过来的数据',css);
-    canvasStyle.top = css.top;
-    canvasStyle.left = css.left;
-    canvasStyle.width = css.width;
-    canvasStyle.height = css.height;
-    canvasStyle.backgroundColor = css.backgroundColor;
-    canvasStyle.zIndex = css.zIndex;
-    setCanvasSize(canvasStyle.backgroundColor, canvasStyle.width, canvasStyle.height);
+    console.log('孙组件Drawer传过来的数据', css);
+    componentStyle.top = css.top;
+    componentStyle.left = css.left;
+    componentStyle.width = css.width;
+    componentStyle.height = css.height;
+    componentStyle.backgroundColor = css.backgroundColor;
+    componentStyle.zIndex = css.zIndex;
+    setCanvasSize(componentStyle.backgroundColor, componentStyle.width, componentStyle.height);
 };
 
 onMounted(() => {
-    setCanvasSize(canvasStyle.backgroundColor, canvasStyle.width, canvasStyle.height);
+    setCanvasSize(componentStyle.backgroundColor, componentStyle.width, componentStyle.height);
 });
 
 onBeforeUnmount(() => {
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+    document.removeEventListener('mousemove', onResize);
+    document.removeEventListener('mouseup', stopResize);
 });
 </script>
 
 <style scoped lang="scss">
-#rectangle {
-    width: auto;
-    height: auto;
+.canvas-container {
+    position: absolute;
+    border: 1px solid black;
     cursor: pointer;
+}
+
+.canvas-element {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 </style>

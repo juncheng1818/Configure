@@ -1,6 +1,6 @@
 <template>
-    <div id="dashboard" @mousedown="addComponent" ref="dashboard_ref">
-        <component v-for="item in componentArr" :is="item.componentName" :top="item.top" :left="item.left" ref="component_ref"></component>
+    <div id="dashboard" @mousedown.stop="addComponent" ref="dashboard_ref">
+        <component v-for="item in dashboardComponent.getComponentList()" :is="item.componentName" :transform="item.transform" :resizable="item.resizable" :id="item.id" :top="item.top" :left="item.left" ref="component_ref"></component>
     </div>
 </template>
 
@@ -18,22 +18,25 @@ const iconChoice = iconChoiceStore()
 const leftIconList = leftIconListStore()
 
 const dashboard_ref = ref(null)
-const componentArr = reactive([])
+
+import { dashboardComponentStore } from '../store' 
+const dashboardComponent = dashboardComponentStore()
 
 const addComponent = (event) => {
-    
+    dashboardComponent.claerResizable()
     let iconName = iconChoice.getIconName()
     if (iconName) {
         const rect = dashboard_ref.value.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        componentArr.push(
-            {
-                componentName: defineAsyncComponent(() => import(`../components/normal/${iconName}.vue`)),
-                top: `${y}px`,
-                left: `${x}px`
-            }
-        )
+        dashboardComponent.addComponentList({
+            id: new Date().getTime().toString(),
+            componentName: defineAsyncComponent(() => import(`../components/normal/${iconName}.vue`)),
+            top: `${y}px`,
+            left: `${x}px`,
+            resizable: false,
+            transform:'rotate(0deg)'
+        })
         iconChoice.clearIconName()
         leftIconList.clearIconFalse()
         message.success('组件添加成功')

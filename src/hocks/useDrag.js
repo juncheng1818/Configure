@@ -1,10 +1,17 @@
 import { ref, onMounted, computed } from 'vue';
+import { dashboardComponentStore } from '../store/index.js'
+const dashboardComponent = dashboardComponentStore()
 
 export function useDrag(canvas, canvasStyle, isDragging, offset, props) {
     const startDrag = (event) => {
         isDragging.value = true;
         offset.x = event.clientX - canvasStyle.left.replace('px', '');
         offset.y = event.clientY - canvasStyle.top.replace('px', '');
+
+        dashboardComponent.showResizable(props.id)
+
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', stopDrag);
     };
 
     const onDrag = (event) => {
@@ -23,10 +30,18 @@ export function useDrag(canvas, canvasStyle, isDragging, offset, props) {
 
         canvasStyle.left = `${newLeft}px`;
         canvasStyle.top = `${newTop}px`;
+
+        document.onmousemove = function (e) {
+            canvasStyle.left = `${newLeft}px`;
+            canvasStyle.top = `${newTop}px`;
+        };
     };
 
     const stopDrag = () => {
         isDragging.value = false;
+
+        document.removeEventListener('mousemove', onDrag);
+        document.removeEventListener('mouseup', stopDrag);
     };
 
     return {

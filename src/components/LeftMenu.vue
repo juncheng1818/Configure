@@ -4,7 +4,7 @@
             <n-tab-pane name="chap1" tab="组件">
                 <n-collapse>
                     <n-collapse-item :title="item.title" name="1" v-for="item in iconList" :key="item">
-                        <n-icon v-for="iconItem in item.normalIcon" :style="{'cursor': 'pointer','background-color': iconItem.choice?'#ddd':''}" @click="iconClick(item.title,iconItem.name)" size="40" :component="iconItem.icon">
+                        <n-icon :title="iconItem.name" v-for="iconItem in item.normalIcon" :style="{'cursor': 'pointer','background-color': iconItem.choice?'#ddd':''}" @click="iconClick(item.title,iconItem.name)" size="40" :component="iconItem.icon">
                         </n-icon>
                     </n-collapse-item>
                 </n-collapse>

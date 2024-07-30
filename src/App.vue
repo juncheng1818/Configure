@@ -1,12 +1,14 @@
 <script setup>
 import Container from './views/container.vue'
-import { NMessageProvider } from 'naive-ui'
+import { NMessageProvider ,NDialogProvider} from 'naive-ui'
 </script>
 
 <template>
-  <n-message-provider>
-    <Container />
-  </n-message-provider>
+  <n-dialog-provider>
+    <n-message-provider>
+      <Container />
+    </n-message-provider>
+  </n-dialog-provider>
 </template>
 
 <style>

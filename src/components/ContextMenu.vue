@@ -13,6 +13,12 @@
 import { ref, reactive ,defineEmits ,defineProps} from 'vue';
 import Drawer from './Drawer.vue';
 
+import { dashboardComponentStore } from '../store/index.js'
+const dashboardComponent = dashboardComponentStore()
+
+import {useDialog} from 'naive-ui'
+const dialog = useDialog()
+
 const drawer_ref = ref(null);
 const visible = ref(false);
 const menuStyle = reactive({
@@ -30,10 +36,14 @@ const props = defineProps({
         default: () => {
             return {}
         }
+    },
+
+    id: {
+        type: String
     }
 })
 
-const showMenu = (x, y, type) => {
+const showMenu = (x, y) => {
     menuStyle.top = `${y}px`;
     menuStyle.left = `${x}px`;
     visible.value = true;
@@ -46,6 +56,17 @@ const hideMenu = () => {
 const menuAction = (action) => {
     if(action === 'delete'){
         //删除，利用pinia，调用store中的方法
+        dialog.warning({
+          title: '警告',
+          content: '你确定？',
+          positiveText: '确定',
+          negativeText: '不确定',
+          onPositiveClick: () => {
+            dashboardComponent.deleteComponentList(props.id);
+          },
+          onNegativeClick: () => {
+          }
+        })
     }
     if (action === 'characteristic') {
         drawer_ref.value.showDrawer(props.canvasStyle);
