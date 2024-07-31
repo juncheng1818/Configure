@@ -1,9 +1,8 @@
 <template>
-    <div ref="canvasContainer" :style="componentStyle" class="canvas-container" @contextmenu.prevent="showContextMenu">
-        <canvas ref="canvas" class="canvas-element" @mousedown.stop="startDrag" @mousemove.stop="onDrag"
-            @mouseup="stopDrag" @mouseleave="stopDrag">
-        </canvas>
-        <ResizeHandles v-if="props.resizable":offset="offset" :id="props.id" :componentStyle="componentStyle" ref="resizeHandles_ref" />
+    <div ref="container_ref" :style="componentStyle" class="canvas-container" @mousedown.stop="startDrag" @mousemove.stop="onDrag"
+            @mouseup="stopDrag" @contextmenu.prevent="showContextMenu">
+        <ResizeHandles v-if="props.resizable" :offset="offset" :id="props.id" :componentStyle="componentStyle"
+            ref="resizeHandles_ref" />
         <ContextMenu ref="contextMenu" @update-css="updateCss" :canvasStyle="componentStyle" :id="props.id" />
     </div>
 </template>
@@ -18,7 +17,7 @@ const contextMenu = ref(null);
 const isDragging = ref(false);
 const offset = reactive({ x: 0, y: 0 });
 
-import { dashboardComponentStore }from '../../store/index.js'
+import { dashboardComponentStore } from '../../store/index.js'
 const dashboardComponent = dashboardComponentStore()
 
 const props = defineProps({
@@ -28,7 +27,7 @@ const props = defineProps({
     resizable: {
         type: Boolean,
     },
-    transform:{
+    transform: {
         type: String
     },
     top: {
@@ -41,32 +40,20 @@ const props = defineProps({
     },
 })
 
-const canvasContainer = ref(null);
+const container_ref = ref(null);
 const componentStyle = reactive({
     position: 'absolute',
-    border: '2px solid black',
     top: props.top,
     left: props.left,
     transform: props.transform,
     width: '100px',
     height: '50px',
-    backgroundColor: '#ffffff',
-    zIndex: 0
+    zIndex: 0,
+    border: '2px solid black',
 });
 
-const setCanvasSize = (backgroundColor, width, height) => {
-    const canvasElement = canvas.value;
-    if (canvasElement) {
-        canvasElement.width = width;
-        canvasElement.height = height;
-        const ctx = canvasElement.getContext('2d');
-        ctx.fillStyle = backgroundColor;
-        ctx.fillRect(0, 0, width, height);
-    }
-};
-
 import { useDrag } from '../../hocks/useDrag.js';
-const { startDrag, onDrag, stopDrag } = useDrag(canvas, componentStyle, isDragging, offset, props);
+const { startDrag, onDrag, stopDrag } = useDrag(container_ref, componentStyle, isDragging, offset, props);
 
 import { useContextMenu } from '../../hocks/useContextMenu.js';
 const { showContextMenu } = useContextMenu(canvas, contextMenu);
@@ -84,7 +71,6 @@ const updateCss = (css) => {
 };
 
 onMounted(() => {
-    setCanvasSize(componentStyle.backgroundColor, componentStyle.width, componentStyle.height);
 });
 
 onBeforeUnmount(() => {
@@ -96,7 +82,6 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .canvas-container {
     position: absolute;
-    border: 1px solid black;
     cursor: pointer;
 }
 
