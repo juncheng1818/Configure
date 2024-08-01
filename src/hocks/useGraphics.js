@@ -35,11 +35,25 @@ export function useGraphics(x, y) {
         draggable: true
     });
 
+    var wedge = new Konva.Wedge({
+        name: 'wedge',
+        x: x,
+        y: y,
+        radius: 70,
+        angle: 60,
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeWidth: 2,
+        draggable: true,
+        rotation: -120
+    });
+
 
     let graphics = {
         'rect': rect,
         'circle': circle,
-        'oval': oval
+        'oval': oval,
+        'wedge': wedge
     }
 
     return {
