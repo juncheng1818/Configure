@@ -37,7 +37,7 @@ const iconClick = (title,data) => {
 
 <style scoped lang="scss">
 #leftMenu {
-    height: 100vh;
+    height: calc(100vh - 50px);
     width: 280px;
     padding: 15px;
     border-right: 1px solid #dddddd80;

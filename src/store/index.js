@@ -1,9 +1,13 @@
 import { defineStore } from "pinia";
+import { shallowRef } from 'vue'
 
 import {
     RectangleLandscape20Regular,
+    Circle16Regular,
+    Oval20Regular,
     Square20Regular,
-    Star20Regular
+    Star20Regular,
+    Triangle48Regular
 } from '@vicons/fluent'
 
 export const dashboardComponentStore = defineStore('dashboardComponent', {
@@ -71,20 +75,35 @@ export const leftIconListStore = defineStore('leftIconList', {
                     title: '常用',
                     normalIcon: [
                         {
-                            'name': 'Rectangle',
-                            'icon': RectangleLandscape20Regular,
+                            'name': 'rect',
+                            'icon': shallowRef(RectangleLandscape20Regular),
                             'choice': false
                         },
                         {
-                            'name': 'Square',
-                            'icon': Square20Regular,
+                            'name': 'circle',
+                            'icon': shallowRef(Circle16Regular),
                             'choice': false
                         },
                         {
-                            'name': 'Star',
-                            'icon': Star20Regular,
+                            'name': 'oval',
+                            'icon': shallowRef(Oval20Regular),
                             'choice': false
                         },
+                        // {
+                        //     'name': 'Square',
+                        //     'icon': Square20Regular,
+                        //     'choice': false
+                        // },
+                        // {
+                        //     'name': 'Star',
+                        //     'icon': Star20Regular,
+                        //     'choice': false
+                        // },
+                        // {
+                        //     'name': 'Triangle',
+                        //     'icon': Triangle48Regular,
+                        //     'choice': false
+                        // },
                     ],
                 }
             ]
