@@ -5,6 +5,7 @@ import {
     RectangleLandscape20Regular,
     Circle16Regular,
     Oval20Regular,
+    Star12Regular,
     Square20Regular,
     Star20Regular,
     Triangle48Regular,
@@ -95,6 +96,11 @@ export const leftIconListStore = defineStore('leftIconList', {
                             'icon': shallowRef(ArrowUpRight20Regular),
                             'choice': false
                         },
+                        {
+                            'name': 'star',
+                            'icon': shallowRef(Star20Regular),
+                            'choice': false
+                        },
                         // {
                         //     'name': 'Square',
                         //     'icon': Square20Regular,
@@ -105,11 +111,16 @@ export const leftIconListStore = defineStore('leftIconList', {
                         //     'icon': Star20Regular,
                         //     'choice': false
                         // },
-                        // {
-                        //     'name': 'Triangle',
-                        //     'icon': Triangle48Regular,
-                        //     'choice': false
-                        // },
+                        {
+                            'name': 'triangle',
+                            'icon': shallowRef(Triangle48Regular),
+                            'choice': false
+                        },
+                    ],
+                },
+                {
+                    title: 'echarts',
+                    normalIcon: [
                     ],
                 }
             ]
