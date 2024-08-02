@@ -7,7 +7,8 @@ import {
     Oval20Regular,
     Square20Regular,
     Star20Regular,
-    Triangle48Regular
+    Triangle48Regular,
+    ArrowUpRight20Regular
 } from '@vicons/fluent'
 
 export const dashboardComponentStore = defineStore('dashboardComponent', {
@@ -87,6 +88,11 @@ export const leftIconListStore = defineStore('leftIconList', {
                         {
                             'name': 'oval',
                             'icon': shallowRef(Oval20Regular),
+                            'choice': false
+                        },
+                        {
+                            'name': 'arrow',
+                            'icon': shallowRef(ArrowUpRight20Regular),
                             'choice': false
                         },
                         // {

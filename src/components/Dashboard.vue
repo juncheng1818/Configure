@@ -49,7 +49,7 @@ const addComponent = (event) => {
         const x = event.clientX - dashboardRect.value.left;
         const y = event.clientY - dashboardRect.value.top;
 
-        const { graphics } = useGraphics(x,y)
+        const { graphics } = useGraphics(x,y,dashboardRect.value.width,dashboardRect.value.height)
         layer.add(graphics[iconName]);
         layer.draw();
 
