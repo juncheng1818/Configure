@@ -78,42 +78,63 @@ export const leftIconListStore = defineStore('leftIconList', {
                     normalIcon: [
                         {
                             'name': 'rect',
-                            'icon': shallowRef(RectangleLandscape20Regular),
+                            'icon': 'icon-juxing',
                             'choice': false
                         },
                         {
                             'name': 'circle',
-                            'icon': shallowRef(Circle16Regular),
+                            'icon': 'icon-xingzhuang-tuoyuanxing',
                             'choice': false
                         },
                         {
                             'name': 'oval',
-                            'icon': shallowRef(Oval20Regular),
+                            'icon':'icon-tuoyuanxing',
                             'choice': false
                         },
                         {
                             'name': 'arrow',
-                            'icon': shallowRef(ArrowUpRight20Regular),
+                            'icon': 'icon-jiang-right',
                             'choice': false
                         },
                         {
                             'name': 'star',
-                            'icon': shallowRef(Star20Regular),
+                            'icon': 'icon-wujiaoxing_kong',
                             'choice': false
                         },
-                        // {
-                        //     'name': 'Square',
-                        //     'icon': Square20Regular,
-                        //     'choice': false
-                        // },
-                        // {
-                        //     'name': 'Star',
-                        //     'icon': Star20Regular,
-                        //     'choice': false
-                        // },
                         {
                             'name': 'triangle',
-                            'icon': shallowRef(Triangle48Regular),
+                            'icon': 'icon-xingzhuang-sanjiaoxing',
+                            'choice': false
+                        },
+                        {
+                            'name': 'trapezoid',
+                            'icon': 'icon-tixing-01',
+                            'choice': false
+                        },
+                        {
+                            'name': 'pentagon',
+                            'icon': 'icon-wubianxing',
+                            'choice': false
+                        },
+                        {
+                            'name': 'hexagon',
+                            'icon': 'icon-hexagon',
+                            'choice': false
+                        },
+                        {
+                            'name': 'wedge',
+                            'icon': 'icon-shanxing',
+                            'choice': false
+                        },
+                        //环形
+                        {
+                            'name': 'ring',
+                            'icon': 'icon-huanxingtu',
+                            'choice': false
+                        },
+                        {
+                            'name': 'arc',
+                            'icon': 'icon-a-chengshishejixiangmutubiao_huaban1fuben196',
                             'choice': false
                         },
                     ],

@@ -1,8 +1,10 @@
+import { ref } from 'vue'
 export function useGraphics(x, y, width, height) {
 
     // 画矩形
     var rect = new Konva.Rect({
         name: 'rect',
+        id: `rect-${Date.now()}`,
         x: x,
         y: y,
         width: 100,
@@ -10,6 +12,7 @@ export function useGraphics(x, y, width, height) {
         fill: '#ffffff',
         stroke: '#000000',
         strokeWidth: 2,
+        cornerRadius: 0,
         draggable: true,
         strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
         dragBoundFunc: function (pos) {
@@ -119,13 +122,31 @@ export function useGraphics(x, y, width, height) {
         name: 'wedge',
         x: x,
         y: y,
-        radius: 70,
+        radius: 80,
         angle: 60,
         fill: '#ffffff',
         stroke: '#000000',
         strokeWidth: 2,
         draggable: true,
-        rotation: -120
+        rotation: -120,
+        draggable: true,
+        strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
+        dragBoundFunc: function (pos) {
+            var stage = this.getStage();
+
+            // 获取三角形的包围盒
+            var boundingBox = this.getClientRect({ relativeTo: stage });
+            // 计算三角形相对于其自身原点的偏移
+            var offsetX = boundingBox.x - this.x();
+            var offsetY = boundingBox.y - this.y();
+            // 计算新的位置，确保包围盒完全在舞台内
+            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
+            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
+            return {
+                x: newX,
+                y: newY
+            };
+        },
     });
 
     //箭头
@@ -209,7 +230,7 @@ export function useGraphics(x, y, width, height) {
     var triangle = new Konva.RegularPolygon({
         x: x,
         y: y,
-        sides: 8,
+        sides: 3,
         radius: 70,
         fill: 'white',
         stroke: 'black',
@@ -227,7 +248,6 @@ export function useGraphics(x, y, width, height) {
             // 计算新的位置，确保包围盒完全在舞台内
             var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
             var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
-
             return {
                 x: newX,
                 y: newY
@@ -237,7 +257,12 @@ export function useGraphics(x, y, width, height) {
 
     //梯形
     var trapezoid = new Konva.Line({
-        points: [x, y + 50, x + 50, y, x + 100, y, x + 150, y + 50],
+        points: [
+            x, y + 150, // 左下角
+            x + 50, y, // 左上角
+            x + 100, y, // 右上角
+            x + 150, y + 150 // 右下角
+        ],
         fill: 'white',
         stroke: 'black',
         strokeWidth: 2,
@@ -260,6 +285,120 @@ export function useGraphics(x, y, width, height) {
         }
     });
 
+    // 五边形
+    var pentagon = new Konva.RegularPolygon({
+        x: x,
+        y: y,
+        sides: 5,
+        radius: 70,
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 2,
+        draggable: true,
+        strokeScaleEnabled: false,
+        dragBoundFunc: function (pos) {
+            var stage = this.getStage();
+
+            // 获取三角形的包围盒
+            var boundingBox = this.getClientRect({ relativeTo: stage });
+            // 计算三角形相对于其自身原点的偏移
+            var offsetX = boundingBox.x - this.x();
+            var offsetY = boundingBox.y - this.y();
+            // 计算新的位置，确保包围盒完全在舞台内
+            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
+            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
+            return {
+                x: newX,
+                y: newY
+            };
+        },
+    });
+
+    // 六边形
+    var hexagon = new Konva.RegularPolygon({
+        x: x,
+        y: y,
+        sides: 6,
+        radius: 70,
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 2,
+        draggable: true,
+        strokeScaleEnabled: false,
+        dragBoundFunc: function (pos) {
+            var stage = this.getStage();
+
+            // 获取三角形的包围盒
+            var boundingBox = this.getClientRect({ relativeTo: stage });
+            // 计算三角形相对于其自身原点的偏移
+            var offsetX = boundingBox.x - this.x();
+            var offsetY = boundingBox.y - this.y();
+            // 计算新的位置，确保包围盒完全在舞台内
+            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
+            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
+            return {
+                x: newX,
+                y: newY
+            };
+        },
+    });
+
+
+    // 环形
+    var ring = new Konva.Ring({
+        x: x,
+        y: y,
+        innerRadius: 40,
+        outerRadius: 70,
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 2,
+        draggable: true,
+        strokeScaleEnabled: false,
+        dragBoundFunc: function (pos) {
+            var stage = this.getStage();
+            var scale = this.scaleX(); // 假设 x 和 y 的缩放比例相同
+            var outerRadius = this.outerRadius() * scale;
+    
+            // 计算新的位置，确保整个环都在舞台内
+            var newX = Math.max(outerRadius, Math.min(pos.x, stage.width() - outerRadius));
+            var newY = Math.max(outerRadius, Math.min(pos.y, stage.height() - outerRadius));
+    
+            return {
+                x: newX,
+                y: newY
+            };
+        },
+    });
+
+    // 弧形
+    var arc = new Konva.Arc({
+        x: 100,
+        y: 100,
+        innerRadius: 40,
+        outerRadius: 70,
+        angle: 90,
+        rotation: -45,
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 2,
+        draggable: true,
+        dragBoundFunc: function (pos) {
+            var stage = this.getStage();
+            var scale = this.scaleX(); // 假设 x 和 y 的缩放比例相同
+            var outerRadius = this.outerRadius() * scale;
+    
+            // 计算新的位置，确保整个弧形都在舞台内
+            var newX = Math.max(outerRadius, Math.min(pos.x, stage.width() - outerRadius));
+            var newY = Math.max(outerRadius, Math.min(pos.y, stage.height() - outerRadius));
+    
+            return {
+                x: newX,
+                y: newY
+            };
+        },
+    });
+
 
     let graphics = {
         'rect': rect,
@@ -268,7 +407,12 @@ export function useGraphics(x, y, width, height) {
         'wedge': wedge,
         'arrow': arrow,
         'star': star,
-        'triangle': triangle
+        'triangle': triangle,
+        'trapezoid': trapezoid,
+        'pentagon': pentagon,
+        'hexagon': hexagon,
+        'ring': ring,
+        'arc': arc
     }
 
     return {

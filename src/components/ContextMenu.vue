@@ -78,7 +78,6 @@ const emit = defineEmits(['update-css']);
 
 const updateCss = (css) => {
     emit('update-css', css);
-
 }
 
 document.addEventListener('click', hideMenu);

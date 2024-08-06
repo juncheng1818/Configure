@@ -22,6 +22,12 @@
                         <n-form-item label="背景色" path="backgroundColor">
                             <n-color-picker v-model:value="formValue.backgroundColor" :show-alpha="false" />
                         </n-form-item>
+                        <n-form-item label="边框颜色" path="backgroundColor">
+                            <n-color-picker v-model:value="formValue.borderColor" :show-alpha="false" />
+                        </n-form-item>
+                        <n-form-item label="边框宽度" path="backgroundColor">
+                            <n-color-picker v-model:value="formValue.borderWidth" :show-alpha="false" />
+                        </n-form-item>
                         <n-form-item>
                             <n-button type="primary" attr-type="button" @click="handleValidateClick">
                                 确定
@@ -37,7 +43,7 @@
 <script setup lang="js">
 
 import { ref, defineProps, defineEmits } from 'vue'
-import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NButton, NFlex ,NColorPicker} from 'naive-ui'
+import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NButton, NFlex, NColorPicker } from 'naive-ui'
 const active = ref(false)
 const placement = ref('right')
 
@@ -47,7 +53,9 @@ const formValue = ref({
     width: 0,
     height: 0,
     backgroundColor: '#fff',
-    zIndex: 0
+    zIndex: 0,
+    borderColor: '#000',
+    borderWidth: 1
 })
 
 const formRef = ref(null)
@@ -82,12 +90,7 @@ const rules = ref(
 
 const showDrawer = (canvasStyle) => {
     formValue.value = {
-        left: canvasStyle.left,
-        top: canvasStyle.top,
-        width: canvasStyle.width,
-        height: canvasStyle.height,
-        backgroundColor: canvasStyle.backgroundColor,
-        zIndex: canvasStyle.zIndex
+        ...canvasStyle
     }
     active.value = true
 }
