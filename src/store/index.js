@@ -1,16 +1,4 @@
 import { defineStore } from "pinia";
-import { shallowRef } from 'vue'
-
-import {
-    RectangleLandscape20Regular,
-    Circle16Regular,
-    Oval20Regular,
-    Star12Regular,
-    Square20Regular,
-    Star20Regular,
-    Triangle48Regular,
-    ArrowUpRight20Regular
-} from '@vicons/fluent'
 
 export const dashboardComponentStore = defineStore('dashboardComponent', {
     state: () => {
@@ -126,17 +114,27 @@ export const leftIconListStore = defineStore('leftIconList', {
                             'icon': 'icon-shanxing',
                             'choice': false
                         },
+
                         //环形
                         {
                             'name': 'ring',
                             'icon': 'icon-huanxingtu',
                             'choice': false
                         },
+
+                        //扇环形
                         {
                             'name': 'arc',
                             'icon': 'icon-a-chengshishejixiangmutubiao_huaban1fuben196',
                             'choice': false
                         },
+
+                        //文字
+                        {
+                            'name': 'simpleText',
+                            'icon': 'icon-wenzi',
+                            'choice': false
+                        }
                     ],
                 },
                 {

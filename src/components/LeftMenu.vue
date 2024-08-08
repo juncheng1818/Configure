@@ -5,9 +5,10 @@
                 <n-collapse accordion :default-expanded-names="['常用']">
                     <n-collapse-item :title="item.title" :name="item.title" v-for="item in iconList" :key="item">
                         <svg v-for="iconItem in item.normalIcon"
+                            :key="iconItem.name"
                             :style="{ 'background-color': iconItem.choice ? '#ddd' : '', 'padding': '0 8px' }"
                             class="icon" aria-hidden="true" @click="iconClick(item.title, iconItem.name)">
-                            <use v-bind:xlink:href="`#${iconItem.icon}`"></use>
+                            <use :title="iconItem.name" v-bind:xlink:href="`#${iconItem.icon}`"></use>
                         </svg>
                     </n-collapse-item>
                 </n-collapse>
@@ -51,6 +52,11 @@ const iconClick = (title, data) => {
     height: 30px;
     width: 30px;
     cursor: pointer;
-    padding: 0 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    &:hover {
+        background-color: #ddd;
+    }
 }
 </style>

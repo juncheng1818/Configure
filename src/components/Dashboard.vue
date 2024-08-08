@@ -2,12 +2,12 @@
     <div id="dashboard" @mousedown="addComponent" ref="dashboard_ref">
         <!-- <component v-for="item in dashboardComponent.getComponentList()" :is="item.componentName" :transform="item.transform" :resizable="item.resizable" :id="item.id" :top="item.top" :left="item.left" ref="component_ref"></component> -->
     </div>
-    <contextMenu @update-css="_updateCss"  ref="contextMenu_ref" />
+    <contextMenu @update-css="_updateCss" @delete-component="_deleteComponent" ref="contextMenu_ref" />
 </template>
 
 <script setup lang="js">
 
-import { ref, shallowRef, reactive, onMounted, nextTick } from 'vue'
+import { ref, shallowRef, reactive, onMounted, nextTick, onUnmounted } from 'vue'
 
 import contextMenu from './ContextMenu.vue'
 const contextMenu_ref = ref(null)
@@ -29,7 +29,15 @@ var layer = null
 const dashboardRect = ref(null)
 
 import { useGraphics } from '../hocks/useGraphics.js'
+import { useCharts } from '../hocks/useCharts.js'
+
 const selectId = ref(null)
+
+import emitter from '../mitt';
+
+onUnmounted(() => {
+    emitter.off('save')
+})
 
 onMounted(() => {
     iconChoice.clearIconName()
@@ -44,7 +52,31 @@ onMounted(() => {
 
         layer = new Konva.Layer();
         stage.add(layer);
+
+        //右击点击事件
+        stage.on('contextmenu', function (e) {
+            e.evt.preventDefault()
+            if (e.target !== stage) {//不是点击舞台
+                selectId.value = e.target.attrs.id
+                var selectNode = stage.findOne(`#${selectId.value}`)
+                var css = selectNode.getAttrs()
+                contextMenu_ref.value.showMenu(e.evt.clientX, e.evt.clientY, css)
+            }
+        })
+
+        useCharts(100, 100, 400, 400, (charts) => {
+            console.log(charts.pie)
+            layer.add(charts.pie);
+            layer.batchDraw(); // 绘制图层
+        });
     })
+
+
+    emitter.on('save', (event) => {
+        console.log('save')
+        console.log(stage.toObject())
+    })
+
 
 })
 
@@ -52,20 +84,31 @@ onMounted(() => {
 function _updateCss(css) {
     var selectNode = stage.findOne(`#${selectId.value}`)
     //改变背景色
-    selectNode.setAttrs(
-        {
-            x: parseInt(css.left),
-            y: parseInt(css.top),
-            width: parseInt(css.width),
-            height: parseInt(css.height),
-            fill: css.backgroundColor,
-            zIndex: parseInt(css.zIndex),
-            stroke: css.backgroundColor,
-            //圆角
-            cornerRadius:  40,
-        }
-    )
-    
+    // selectNode.setAttrs(
+    //     {
+    //         x: parseInt(css.x),
+    //         y: parseInt(css.y),
+    //         width: parseInt(css.width),
+    //         height: parseInt(css.height),
+    //         fill: css.fill,
+    //         zIndex: parseInt(css.zIndex),
+    //         stroke: css.stroke,
+    //         strokeWidth: parseInt(css.strokeWidth),
+    //         cornerRadius: parseInt(css.cornerRadius),
+    //     }
+    // )
+
+    selectNode.setAttrs({ ...css })
+
+}
+
+function _deleteComponent() {
+    //删除组件同时删除transformer
+    var selectNode = stage.findOne(`#${selectId.value}`)
+    stage.find('Transformer').forEach(tr => tr.destroy());
+    selectNode.destroy();
+    layer.draw();
+    selectId.value = null
 }
 
 const addComponent = (event) => {
@@ -75,6 +118,7 @@ const addComponent = (event) => {
         const y = event.clientY - dashboardRect.value.top;
 
         const { graphics } = useGraphics(x, y, dashboardRect.value.width, dashboardRect.value.height)
+
         layer.add(graphics[iconName]);
         layer.draw();
 
@@ -99,18 +143,6 @@ const addComponent = (event) => {
             tr.nodes([e.target]);
             layer.draw();
         });
-
-        stage.on('contextmenu', function (e) {
-            e.evt.preventDefault()
-            if (e.target !== stage) {//不是点击舞台
-                selectId.value = e.target.attrs.id
-                contextMenu_ref.value.showMenu(e.evt.clientX, e.evt.clientY)
-                var selectNode = stage.findOne(`#${selectId.value}`)
-                console.log(selectNode)
-                var css = selectNode.getAttrs()
-                console.log(css)
-            }
-        })
 
         iconChoice.clearIconName()
         leftIconList.clearIconFalse()

@@ -1,2 +1,5 @@
 import mitt from 'mitt'
-export const bus = mitt()
+// 创建mitt实例
+const emitter = mitt()
+// 导出
+export default emitter

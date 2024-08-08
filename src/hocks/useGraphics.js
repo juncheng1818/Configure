@@ -42,6 +42,7 @@ export function useGraphics(x, y, width, height) {
     // 画圆
     var circle = new Konva.Circle({
         name: 'circle',
+        id: `circle-${Date.now()}`,
         x: x,
         y: y,
         radius: 40,
@@ -80,6 +81,7 @@ export function useGraphics(x, y, width, height) {
     // 画椭圆
     var oval = new Konva.Ellipse({
         name: 'oval',
+        id: `oval-${Date.now()}`,
         x: x,
         y: y,
         radiusX: 60,
@@ -120,6 +122,7 @@ export function useGraphics(x, y, width, height) {
     //扇形
     var wedge = new Konva.Wedge({
         name: 'wedge',
+        id: `wedge-${Date.now()}`,
         x: x,
         y: y,
         radius: 80,
@@ -151,12 +154,14 @@ export function useGraphics(x, y, width, height) {
 
     //箭头
     var arrow = new Konva.Arrow({
+        name: 'arrow',
+        id: `arrow-${Date.now()}`,
         x: x,
         y: y,
         points: [0, 0, 100, 50],
-        pointerLength: 20,
-        pointerWidth: 10,
-        fill: 'black',
+        pointerLength: 26,
+        pointerWidth: 20,
+        fill: 'white',
         stroke: 'black',
         strokeWidth: 2,
         draggable: true,
@@ -187,6 +192,8 @@ export function useGraphics(x, y, width, height) {
 
     //五角星
     var star = new Konva.Star({
+        name: 'star',
+        id: `star-${Date.now()}`,
         x: x,
         y: y,
         numPoints: 5,
@@ -228,6 +235,8 @@ export function useGraphics(x, y, width, height) {
 
     // 三角形
     var triangle = new Konva.RegularPolygon({
+        name: 'triangle',
+        id: `triangle-${Date.now()}`,
         x: x,
         y: y,
         sides: 3,
@@ -257,6 +266,8 @@ export function useGraphics(x, y, width, height) {
 
     //梯形
     var trapezoid = new Konva.Line({
+        name: 'trapezoid',
+        id: `trapezoid-${Date.now()}`,
         points: [
             x, y + 150, // 左下角
             x + 50, y, // 左上角
@@ -287,6 +298,8 @@ export function useGraphics(x, y, width, height) {
 
     // 五边形
     var pentagon = new Konva.RegularPolygon({
+        name: 'pentagon',
+        id: `pentagon-${Date.now()}`,
         x: x,
         y: y,
         sides: 5,
@@ -316,6 +329,8 @@ export function useGraphics(x, y, width, height) {
 
     // 六边形
     var hexagon = new Konva.RegularPolygon({
+        name: 'hexagon',
+        id: `hexagon-${Date.now()}`,
         x: x,
         y: y,
         sides: 6,
@@ -346,6 +361,8 @@ export function useGraphics(x, y, width, height) {
 
     // 环形
     var ring = new Konva.Ring({
+        name: 'ring',
+        id: `ring-${Date.now()}`,
         x: x,
         y: y,
         innerRadius: 40,
@@ -359,11 +376,11 @@ export function useGraphics(x, y, width, height) {
             var stage = this.getStage();
             var scale = this.scaleX(); // 假设 x 和 y 的缩放比例相同
             var outerRadius = this.outerRadius() * scale;
-    
+
             // 计算新的位置，确保整个环都在舞台内
             var newX = Math.max(outerRadius, Math.min(pos.x, stage.width() - outerRadius));
             var newY = Math.max(outerRadius, Math.min(pos.y, stage.height() - outerRadius));
-    
+
             return {
                 x: newX,
                 y: newY
@@ -373,6 +390,8 @@ export function useGraphics(x, y, width, height) {
 
     // 弧形
     var arc = new Konva.Arc({
+        name: 'arc',
+        id: `arc-${Date.now()}`,
         x: 100,
         y: 100,
         innerRadius: 40,
@@ -383,15 +402,16 @@ export function useGraphics(x, y, width, height) {
         stroke: 'black',
         strokeWidth: 2,
         draggable: true,
+        strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
             var stage = this.getStage();
             var scale = this.scaleX(); // 假设 x 和 y 的缩放比例相同
             var outerRadius = this.outerRadius() * scale;
-    
+
             // 计算新的位置，确保整个弧形都在舞台内
             var newX = Math.max(outerRadius, Math.min(pos.x, stage.width() - outerRadius));
             var newY = Math.max(outerRadius, Math.min(pos.y, stage.height() - outerRadius));
-    
+
             return {
                 x: newX,
                 y: newY
@@ -399,6 +419,31 @@ export function useGraphics(x, y, width, height) {
         },
     });
 
+    //简单文字
+    var simpleText = new Konva.Text({
+        name: 'simpleText',
+        id: `simpleText-${Date.now()}`,
+        x: x,
+        y: y,
+        text: 'peace',
+        fontSize: 30,
+        fontFamily: 'Calibri',
+        fill: 'black',
+        draggable: true,
+        strokeScaleEnabled: false,
+        dragBoundFunc: function (pos) {
+            var stage = this.getStage();
+            // 获取文本的边界框
+            var textBox = this.getClientRect({relativeTo: stage});
+            // 计算新的位置，确保文本不会超出舞台边界
+            var newX = Math.max(0, Math.min(pos.x, stage.width() - textBox.width));
+            var newY = Math.max(0, Math.min(pos.y, stage.height() - textBox.height));
+            return {
+                x: newX,
+                y: newY
+            };
+        },
+    });
 
     let graphics = {
         'rect': rect,
@@ -412,7 +457,8 @@ export function useGraphics(x, y, width, height) {
         'pentagon': pentagon,
         'hexagon': hexagon,
         'ring': ring,
-        'arc': arc
+        'arc': arc,
+        'simpleText': simpleText
     }
 
     return {

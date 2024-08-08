@@ -31,22 +31,18 @@ const menuStyle = reactive({
 });
 
 const props = defineProps({
-    canvasStyle: {
-        type: Object,
-        default: () => {
-            return {}
-        }
-    },
-
     id: {
         type: String
     }
 })
 
-const showMenu = (x, y) => {
+const cssList = ref({});
+
+const showMenu = (x, y,css) => {
     menuStyle.top = `${y}px`;
     menuStyle.left = `${x}px`;
     visible.value = true;
+    cssList.value = {...css}
 };
 
 const hideMenu = () => {
@@ -62,19 +58,20 @@ const menuAction = (action) => {
           positiveText: '确定',
           negativeText: '不确定',
           onPositiveClick: () => {
-            dashboardComponent.deleteComponentList(props.id);
+            emit('delete-component');
+            // dashboardComponent.deleteComponentList(props.id);
           },
           onNegativeClick: () => {
           }
         })
     }
     if (action === 'characteristic') {
-        drawer_ref.value.showDrawer(props.canvasStyle);
+        drawer_ref.value.showDrawer(cssList.value);
     }
     hideMenu();
 };
 
-const emit = defineEmits(['update-css']);
+const emit = defineEmits(['update-css','delete-component']);
 
 const updateCss = (css) => {
     emit('update-css', css);

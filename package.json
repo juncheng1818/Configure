@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "echarts": "^5.5.1",
     "konva": "^9.3.14",
     "lodash": "^4.17.21",
     "mitt": "^3.0.1",
