@@ -4,7 +4,7 @@
 ### Free dragging and combination, suitable for factory custom dashboards or large screens
 ### JS Framework：[Vite](https://vitejs.dev/) + [Vue3](https://vuejs.org/)
 ### UI Framework：[Naive ui](https://www.naiveui.com/)
-### Graphics framework: [konva](https://konvajs.org/)
+### Graphics framework: [Konva](https://konvajs.org/) + [Echarts](https://echarts.apache.org/)
 
 ### Changelog
 - 2024.07.26 Initial project, added rectangle to render in the left list

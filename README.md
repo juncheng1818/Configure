@@ -5,7 +5,7 @@
 ### 自由拖动、组合，适用于工厂自定义看板或大屏
 ### JS框架：[Vite](https://vitejs.dev/) + [Vue3](https://vuejs.org/)
 ### UI框架：[Naive ui](https://www.naiveui.com/)
-### 图形框架：[konva](https://konvajs.org/)
+### 图形框架：[Konva](https://konvajs.org/) + [Echarts](https://echarts.apache.org/)
 
 ### 更新日志
 - 2024.07.26 初始项目，左侧列表渲染添加矩形
