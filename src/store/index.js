@@ -1,3 +1,4 @@
+import { get } from "lodash";
 import { defineStore } from "pinia";
 
 export const dashboardComponentStore = defineStore('dashboardComponent', {
@@ -138,8 +139,13 @@ export const leftIconListStore = defineStore('leftIconList', {
                     ],
                 },
                 {
-                    title: 'echarts',
+                    title: '图表',
                     normalIcon: [
+                        {
+                            'name': 'pie',
+                            'icon': 'icon-chart-pie',
+                            'choice': false
+                        }
                     ],
                 }
             ]
@@ -183,6 +189,7 @@ export const iconChoiceStore = defineStore('iconChoice', {
     state: () => {
         return {
             name: '',
+            title: '',
         }
     },
 
@@ -191,12 +198,17 @@ export const iconChoiceStore = defineStore('iconChoice', {
     },
 
     actions: {
-        setIconName(name) {
+        setIconName(title,name) {
             this.name = name
+            this.title = title
         },
 
         getIconName() {
             return this.name
+        },
+
+        getIconTitle() {
+            return this.title
         },
 
         clearIconName() {

@@ -42,7 +42,7 @@ onUnmounted(() => {
 onMounted(() => {
     iconChoice.clearIconName()
     leftIconList.clearIconFalse()
-    nextTick(() => {
+    nextTick(async () => {
         dashboardRect.value = dashboard_ref.value.getBoundingClientRect();
         stage = new Konva.Stage({
             container: 'dashboard',
@@ -64,11 +64,6 @@ onMounted(() => {
             }
         })
 
-        useCharts(100, 100, 400, 400, (charts) => {
-            console.log(charts.pie)
-            layer.add(charts.pie);
-            layer.batchDraw(); // 绘制图层
-        });
     })
 
 
@@ -111,16 +106,42 @@ function _deleteComponent() {
     selectId.value = null
 }
 
-const addComponent = (event) => {
+const addComponent = async (event) => {
     let iconName = iconChoice.getIconName()
+    let iconTitle = iconChoice.getIconTitle()
     if (iconName) {
         const x = event.clientX - dashboardRect.value.left;
         const y = event.clientY - dashboardRect.value.top;
 
-        const { graphics } = useGraphics(x, y, dashboardRect.value.width, dashboardRect.value.height)
+        if (iconTitle === '常用') {
+            const { graphics } = useGraphics(x, y, dashboardRect.value.width, dashboardRect.value.height)
+            layer.add(graphics[iconName]);
+            layer.draw();
+        }
 
-        layer.add(graphics[iconName]);
-        layer.draw();
+        if (iconTitle === '图表') {
+            const { charts } = await useCharts(x, y, 200, 200)
+            const { chartDiv, myChart, imageObj } = charts[iconName]
+            const chart = charts[iconName][iconName] //原图表
+            layer.add(chart);
+            layer.draw();
+            chart.on('transform', () => {
+                const newWidth = chart.width() * chart.scaleX();
+                const newHeight = chart.height() * chart.scaleY();
+
+                // 更新 ECharts 的尺寸
+                chartDiv.style.width = newWidth + 'px';
+                chartDiv.style.height = newHeight + 'px';
+                myChart.resize();
+
+                // 更新 Konva.Image 的内容
+                imageObj.src = myChart.getDataURL();
+                chart.image(imageObj);
+
+                // 重新绘制层
+                layer.draw();
+            })
+        }
 
         // 监听舞台点击事件，处理 Transformer
         stage.on('click tap', function (e) {

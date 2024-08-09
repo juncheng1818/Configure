@@ -34,7 +34,7 @@ const iconChoice = iconChoiceStore()
 const iconClick = (title, data) => {
     leftIconList.clearIconFalse()
     leftIconList.changeIcon(title, data)
-    iconChoice.setIconName(data)
+    iconChoice.setIconName(title,data)
 }
 
 </script>
