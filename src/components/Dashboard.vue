@@ -1,18 +1,19 @@
 <template>
-    <div id="dashboard" @mousedown="addComponent" ref="dashboard_ref">
-        <!-- <component v-for="item in dashboardComponent.getComponentList()" :is="item.componentName" :transform="item.transform" :resizable="item.resizable" :id="item.id" :top="item.top" :left="item.left" ref="component_ref"></component> -->
-    </div>
+    <n-spin :show="showSpin" :description="'正在添加'">
+        <div id="dashboard" @mousedown="addComponent" ref="dashboard_ref">
+        </div>
+    </n-spin>
     <contextMenu @update-css="_updateCss" @delete-component="_deleteComponent" ref="contextMenu_ref" />
 </template>
 
 <script setup lang="js">
-
+import * as echarts from 'echarts';
 import { ref, shallowRef, reactive, onMounted, nextTick, onUnmounted } from 'vue'
 
 import contextMenu from './ContextMenu.vue'
 const contextMenu_ref = ref(null)
 
-import { useMessage } from 'naive-ui'
+import { useMessage, NSpin } from 'naive-ui'
 const message = useMessage()
 
 import { iconChoiceStore, leftIconListStore } from '../store'
@@ -34,6 +35,8 @@ import { useCharts } from '../hocks/useCharts.js'
 const selectId = ref(null)
 
 import emitter from '../mitt';
+
+const showSpin = ref(false)
 
 onUnmounted(() => {
     emitter.off('save')
@@ -66,33 +69,16 @@ onMounted(() => {
 
     })
 
-
     emitter.on('save', (event) => {
         console.log('save')
         console.log(stage.toObject())
     })
-
 
 })
 
 //更新css
 function _updateCss(css) {
     var selectNode = stage.findOne(`#${selectId.value}`)
-    //改变背景色
-    // selectNode.setAttrs(
-    //     {
-    //         x: parseInt(css.x),
-    //         y: parseInt(css.y),
-    //         width: parseInt(css.width),
-    //         height: parseInt(css.height),
-    //         fill: css.fill,
-    //         zIndex: parseInt(css.zIndex),
-    //         stroke: css.stroke,
-    //         strokeWidth: parseInt(css.strokeWidth),
-    //         cornerRadius: parseInt(css.cornerRadius),
-    //     }
-    // )
-
     selectNode.setAttrs({ ...css })
 
 }
@@ -103,6 +89,11 @@ function _deleteComponent() {
     stage.find('Transformer').forEach(tr => tr.destroy());
     selectNode.destroy();
     layer.draw();
+
+    //同时删除echarts
+    echarts.dispose(document.getElementById(`echarts-container-${selectNode.getAttr('id').split('-')[2]}`))
+    //删除dom
+    document.getElementById(`echarts-container-${selectNode.getAttr('id').split('-')[2]}`).remove()
     selectId.value = null
 }
 
@@ -110,6 +101,7 @@ const addComponent = async (event) => {
     let iconName = iconChoice.getIconName()
     let iconTitle = iconChoice.getIconTitle()
     if (iconName) {
+        showSpin.value = true
         const x = event.clientX - dashboardRect.value.left;
         const y = event.clientY - dashboardRect.value.top;
 
@@ -120,27 +112,9 @@ const addComponent = async (event) => {
         }
 
         if (iconTitle === '图表') {
-            const { charts } = await useCharts(x, y, 200, 200)
-            const { chartDiv, myChart, imageObj } = charts[iconName]
-            const chart = charts[iconName][iconName] //原图表
-            layer.add(chart);
+            const { charts } = useCharts(x, y, dashboardRect.value.width, dashboardRect.value.height, iconName)
+            layer.add(charts['rect']);
             layer.draw();
-            chart.on('transform', () => {
-                const newWidth = chart.width() * chart.scaleX();
-                const newHeight = chart.height() * chart.scaleY();
-
-                // 更新 ECharts 的尺寸
-                chartDiv.style.width = newWidth + 'px';
-                chartDiv.style.height = newHeight + 'px';
-                myChart.resize();
-
-                // 更新 Konva.Image 的内容
-                imageObj.src = myChart.getDataURL();
-                chart.image(imageObj);
-
-                // 重新绘制层
-                layer.draw();
-            })
         }
 
         // 监听舞台点击事件，处理 Transformer
@@ -167,6 +141,8 @@ const addComponent = async (event) => {
 
         iconChoice.clearIconName()
         leftIconList.clearIconFalse()
+
+        showSpin.value = false
         message.success('组件添加成功')
     } else {
         // message.warning('请选择组件')
@@ -178,7 +154,7 @@ const addComponent = async (event) => {
 <style scoped lang="scss">
 #dashboard {
     height: calc(100vh - 50px);
-    flex: 1;
+    width: calc(100vw - 280px);
     position: relative;
 }
 </style>

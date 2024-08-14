@@ -22,7 +22,7 @@
 
 <script setup lang="js">
 
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, defineEmits } from 'vue'
 import { NDrawer, NDrawerContent, NForm, NFormItem, NInput, NButton, NFlex, NColorPicker } from 'naive-ui'
 const active = ref(false)
 const placement = ref('right')
