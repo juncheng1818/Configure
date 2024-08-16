@@ -19,7 +19,7 @@ export function useCharts(x, y, width, height,chartType) {
         rectHeight = 180;
         rectWidth = 180;
     }
-    // Create a draggable rectangle
+    
     var rect = new Konva.Rect({
         name: 'rect-pie',
         id: `rect-pie-${timestamp}`,

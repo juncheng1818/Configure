@@ -2,8 +2,8 @@
     <div id="leftMenu">
         <NTabs type="segment" animated>
             <n-tab-pane name="chap1" tab="组件">
-                <n-collapse accordion :default-expanded-names="['常用']">
-                    <n-collapse-item :title="item.title" :name="item.title" v-for="item in iconList" :key="item">
+                <n-collapse :default-expanded-names="['常用']">
+                    <n-collapse-item :title="item.title+'（'+item.normalIcon.length+'）'" :name="item.title" v-for="item in iconList" :key="item">
                         <svg v-for="iconItem in item.normalIcon"
                             :key="iconItem.name"
                             :style="{ 'background-color': iconItem.choice ? '#ddd' : '', 'padding': '0 8px' }"
@@ -14,7 +14,7 @@
                 </n-collapse>
             </n-tab-pane>
             <n-tab-pane name="chap2" tab="我的组件">
-                developing
+                <img style="width: 180px;height: 180px" src="../svg/耗氧池.svg" alt="">
             </n-tab-pane>
         </NTabs>
     </div>

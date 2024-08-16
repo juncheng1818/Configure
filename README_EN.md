@@ -22,3 +22,4 @@ The left list icon rendering temporarily uses the Symbol method of Alibaba vecto
 - 2024.08.01 Added rendering circles and ellipses
 * 2024.08.09 Improve common graphics and add echarts pie chart
 + 2024.08.14 Improve and add graphics, linear, gauge, bar chart, pie chart
+- 2024.08.16 Add connecting line

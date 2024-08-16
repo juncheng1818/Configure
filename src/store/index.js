@@ -161,6 +161,16 @@ export const leftIconListStore = defineStore('leftIconList', {
                             'choice': false
                         },
                     ],
+                },
+                {
+                    title: '连线',
+                    normalIcon: [
+                        {
+                            'name': 'connect-line',
+                            'icon': 'icon-map-connect-full',
+                            'choice': false
+                        },
+                    ],
                 }
             ]
 

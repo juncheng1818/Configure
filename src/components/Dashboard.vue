@@ -31,6 +31,7 @@ const dashboardRect = ref(null)
 
 import { useGraphics } from '../hocks/useGraphics.js'
 import { useCharts } from '../hocks/useCharts.js'
+import { useConnectLine } from '../hocks/useConnectLine.js'
 
 const selectId = ref(null)
 
@@ -115,6 +116,10 @@ const addComponent = async (event) => {
             const { charts } = useCharts(x, y, dashboardRect.value.width, dashboardRect.value.height, iconName)
             layer.add(charts['rect']);
             layer.draw();
+        }
+
+        if(iconTitle === '连线'){
+            useConnectLine(x, y, dashboardRect.value.width, dashboardRect.value.height, layer,stage)
         }
 
         // 监听舞台点击事件，处理 Transformer
