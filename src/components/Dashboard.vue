@@ -32,6 +32,7 @@ const dashboardRect = ref(null)
 import { useGraphics } from '../hocks/useGraphics.js'
 import { useCharts } from '../hocks/useCharts.js'
 import { useConnectLine } from '../hocks/useConnectLine.js'
+import { useClock } from '../hocks/useClock.js'
 
 const selectId = ref(null)
 
@@ -62,9 +63,12 @@ onMounted(() => {
             e.evt.preventDefault()
             if (e.target !== stage) {//不是点击舞台
                 selectId.value = e.target.attrs.id
-                var selectNode = stage.findOne(`#${selectId.value}`)
-                var css = selectNode.getAttrs()
-                contextMenu_ref.value.showMenu(e.evt.clientX, e.evt.clientY, css)
+                // var selectNode = stage.findOne(`#${selectId.value}`)
+                // var css = selectNode.getAttrs()
+                if (selectId.value.includes('connect-line-anchor')) {
+                    return
+                }
+                contextMenu_ref.value.showMenu(e.evt.clientX, e.evt.clientY, stage, selectId.value,layer)
             }
         })
 
@@ -80,7 +84,29 @@ onMounted(() => {
 //更新css
 function _updateCss(css) {
     var selectNode = stage.findOne(`#${selectId.value}`)
-    selectNode.setAttrs({ ...css })
+    if (selectId.value.includes('connect-line')) {
+        let timestamp = selectId.value.split('-')[2]
+        let group = stage.findOne(`#connect-line-group-${timestamp}`)
+        let mainLine = stage.findOne(`#connect-line-${timestamp}`)
+        let animatedLine = stage.findOne(`#connect-line-animated-${timestamp}`)
+        let anchor = stage.findOne(`#connect-line-anchor-${timestamp}`)
+
+        group.setAttrs({ x: Number(css.x), y: Number(css.y) })
+        mainLine.setAttrs({ stroke: css['mainLine-stroke'], strokeWidth: css['mainLine-strokeWidth'] })
+        animatedLine.setAttrs({ stroke: css['animatedLine-stroke'], strokeWidth: css['animatedLine-strokeWidth'] })
+        anchor.setAttrs({ fill: css['anchor-fill'] })
+
+        let animation = group.getAnimation();
+
+        if (animation) {
+            group.changeFlowSpeed(Number(css['FlowSpeed']));
+            animation.stop();
+            animation.start();
+        }
+
+    } else {
+        selectNode.setAttrs({ ...css })
+    }
 
 }
 
@@ -91,10 +117,21 @@ function _deleteComponent() {
     selectNode.destroy();
     layer.draw();
 
-    //同时删除echarts
-    echarts.dispose(document.getElementById(`echarts-container-${selectNode.getAttr('id').split('-')[2]}`))
-    //删除dom
-    document.getElementById(`echarts-container-${selectNode.getAttr('id').split('-')[2]}`).remove()
+    // echarts删除
+    let e = document.getElementById(`echarts-container-${selectNode.getAttr('id').split('-')[2]}`)
+    if (e) {
+        echarts.dispose(e)
+        //删除dom
+        e.remove()
+    }
+
+    // 删除连接线,先确定是不是连接线
+    if (selectId.value.includes('connect-line')) {
+        let connectLineId = selectId.value.split('-')[2]
+        stage.findOne(`#connect-line-group-${connectLineId}`).destroy()
+        layer.draw();
+    }
+
     selectId.value = null
 }
 
@@ -118,8 +155,15 @@ const addComponent = async (event) => {
             layer.draw();
         }
 
-        if(iconTitle === '连线'){
-            useConnectLine(x, y, dashboardRect.value.width, dashboardRect.value.height, layer,stage)
+        if (iconTitle === '连线') {
+            useConnectLine(x, y, dashboardRect.value.width, dashboardRect.value.height, layer, stage)
+        }
+
+        if(iconTitle === '时间'){
+            const { clock } = useClock(x, y, dashboardRect.value.width, dashboardRect.value.height,layer,stage)
+            layer.add(clock[iconName]);
+            layer.draw();
+            setInterval(clock[iconName].updateClockText(),1000) 
         }
 
         // 监听舞台点击事件，处理 Transformer

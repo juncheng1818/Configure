@@ -171,6 +171,21 @@ export const leftIconListStore = defineStore('leftIconList', {
                             'choice': false
                         },
                     ],
+                },
+                {
+                    title: '时间',
+                    normalIcon: [
+                        {
+                            'name': 'clockText',
+                            'icon': 'icon-dianzishizhong',
+                            'choice': false
+                        },
+                        {
+                            'name': 'clockFace',
+                            'icon': 'icon-shizhong',
+                            'choice': false
+                        },
+                    ],
                 }
             ]
 

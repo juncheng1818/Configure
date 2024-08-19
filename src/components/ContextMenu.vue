@@ -1,6 +1,10 @@
 <template>
     <div v-if="visible" :style="menuStyle" class="context-menu">
         <ul>
+            <li @click="menuAction('moveToTop')">顶层</li>
+            <li @click="menuAction('moveUp')">向上一层</li>
+            <li @click="menuAction('moveToBottom')">底层</li>
+            <li @click="menuAction('moveDown')">向下一层</li>
             <li @click="menuAction('delete')">删除</li>
             <li @click="menuAction('characteristic')">属性</li>
         </ul>
@@ -36,13 +40,17 @@ const props = defineProps({
     }
 })
 
-const cssList = ref({});
+const stage = ref(null);
+const selectId = ref('');
+const layer = ref('');
 
-const showMenu = (x, y,css) => {
+const showMenu = (x, y,_stage,_selectId,_layer) => {
     menuStyle.top = `${y}px`;
     menuStyle.left = `${x}px`;
     visible.value = true;
-    cssList.value = {...css}
+    stage.value = _stage
+    selectId.value = _selectId
+    layer.value = _layer
 };
 
 const hideMenu = () => {
@@ -50,13 +58,50 @@ const hideMenu = () => {
 };
 
 const menuAction = (action) => {
+    if(action === 'moveToTop'){
+        if(selectId.value.includes('connect-line')){
+            let timestamp = selectId.value.split('-')[2]
+            stage.value.findOne(`#connect-line-group-${timestamp}`).moveToTop();
+        }else{
+            stage.value.findOne(`#${selectId.value}`).moveToTop();
+        }
+        layer.value.draw();
+    }
+    if(action === 'moveUp'){
+        if(selectId.value.includes('connect-line')){
+            let timestamp = selectId.value.split('-')[2]
+            stage.value.findOne(`#connect-line-group-${timestamp}`).moveUp();
+        }else{
+            stage.value.findOne(`#${selectId.value}`).moveUp();
+        }
+        layer.value.draw();
+    }
+    if(action === 'moveToBottom'){
+        if(selectId.value.includes('connect-line')){
+            let timestamp = selectId.value.split('-')[2]
+            stage.value.findOne(`#connect-line-group-${timestamp}`).moveToBottom();
+        }else{
+            stage.value.findOne(`#${selectId.value}`).moveToBottom();
+        }
+        layer.value.draw();
+    }
+
+    if(action === 'moveDown'){
+        if(selectId.value.includes('connect-line')){
+            let timestamp = selectId.value.split('-')[2]
+            stage.value.findOne(`#connect-line-group-${timestamp}`).moveDown();
+        }else{
+            stage.value.findOne(`#${selectId.value}`).moveDown();
+        }
+        layer.value.draw();
+    }
+
     if(action === 'delete'){
-        //删除，利用pinia，调用store中的方法
         dialog.warning({
           title: '警告',
           content: '你确定？',
           positiveText: '确定',
-          negativeText: '不确定',
+          negativeText: '取消',
           onPositiveClick: () => {
             emit('delete-component');
             // dashboardComponent.deleteComponentList(props.id);
@@ -66,7 +111,7 @@ const menuAction = (action) => {
         })
     }
     if (action === 'characteristic') {
-        drawer_ref.value.showDrawer(cssList.value);
+        drawer_ref.value.showDrawer(stage.value,selectId.value);
     }
     hideMenu();
 };
