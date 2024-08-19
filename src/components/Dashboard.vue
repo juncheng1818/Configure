@@ -162,8 +162,8 @@ const addComponent = async (event) => {
         if(iconTitle === '时间'){
             const { clock } = useClock(x, y, dashboardRect.value.width, dashboardRect.value.height,layer,stage)
             layer.add(clock[iconName]);
+            setInterval(clock[iconName].updateClock.bind(clock[iconName]),1000) 
             layer.draw();
-            setInterval(clock[iconName].updateClockText(),1000) 
         }
 
         // 监听舞台点击事件，处理 Transformer

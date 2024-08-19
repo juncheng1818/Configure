@@ -20,7 +20,7 @@ export function useClock(x, y, width, height, layer, stage) {
     });
 
     // 更新时钟的函数
-    clockText.updateClockText = function() {
+    clockText.updateClock = function () {
 
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -29,7 +29,7 @@ export function useClock(x, y, width, height, layer, stage) {
         const timeString = `${hours}:${minutes}:${seconds}`;
 
         // 更新文本内容
-        clockText.text(timeString);
+        this.text(timeString);
         layer.draw()
     }
 
@@ -87,7 +87,7 @@ export function useClock(x, y, width, height, layer, stage) {
     // layer.add(secondHand);
 
     // // 更新时钟的函数
-    // function updateClockFace() {
+    // clockFace.updateClock = function () {
     //     const now = new Date();
     //     const hours = now.getHours();
     //     const minutes = now.getMinutes();
@@ -104,9 +104,6 @@ export function useClock(x, y, width, height, layer, stage) {
 
     //     layer.draw();
     // }
-
-    // setInterval(updateClockText, 1000);
-    // setInterval(updateClockFace, 1000);
 
     let clock = {
         'clockText': clockText,
