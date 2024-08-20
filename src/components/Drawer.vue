@@ -5,8 +5,9 @@
                 <n-form ref="formRef" label-width="80" inline :model="formValue" :rules="rules">
                     <n-flex>
                         <n-form-item v-for="(value, name, index) in formValue" :label="name" path="x">
-                            <n-input :disabled="name == 'id' || name == 'name'" v-model:value="formValue[name]"
-                                placeholder="请输入" />
+                            <n-input :disabled="name == 'id' || name == 'name'"
+                                :type="name == 'id' || name == 'name' || name == 'text' || name == 'stroke' || name == 'fill' || name == 'mainLine-stroke' || name == 'animatedLine-stroke' || name == 'anchor-fill' ? 'text' : 'number'"
+                                v-model:value="formValue[name]" placeholder="请输入" />
                         </n-form-item>
                         <n-form-item>
                             <n-button type="primary" attr-type="button" @click="handleValidateClick">
@@ -72,7 +73,7 @@ const showDrawer = (stage, selectId) => {
             // 'anchor-radius': anchor.radius(),
             'anchor-fill': anchor.fill(),
 
-            'FlowSpeed':group.getFrameDuration()
+            'FlowSpeed': group.getFrameDuration()
         }
     } else {
         var css = selectNode.getAttrs()

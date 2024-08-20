@@ -1,8 +1,6 @@
 <template>
-    <n-spin :show="showSpin" :description="'正在添加'">
-        <div id="dashboard" @mousedown="addComponent" ref="dashboard_ref">
-        </div>
-    </n-spin>
+    <div id="dashboard" @mousedown="addComponent" ref="dashboard_ref">
+    </div>
     <contextMenu @update-css="_updateCss" @delete-component="_deleteComponent" ref="contextMenu_ref" />
 </template>
 
@@ -33,6 +31,7 @@ import { useGraphics } from '../hocks/useGraphics.js'
 import { useCharts } from '../hocks/useCharts.js'
 import { useConnectLine } from '../hocks/useConnectLine.js'
 import { useClock } from '../hocks/useClock.js'
+import { useHeatingSystem } from '../hocks/useHeatingSystem.js'
 
 const selectId = ref(null)
 
@@ -42,6 +41,9 @@ const showSpin = ref(false)
 
 onUnmounted(() => {
     emitter.off('save')
+    emitter.off('upload')
+    emitter.off('preview')
+    emitter.off('changeWidthAndHeight')
 })
 
 onMounted(() => {
@@ -68,17 +70,20 @@ onMounted(() => {
                 if (selectId.value.includes('connect-line-anchor')) {
                     return
                 }
-                contextMenu_ref.value.showMenu(e.evt.clientX, e.evt.clientY, stage, selectId.value,layer)
+                contextMenu_ref.value.showMenu(e.evt.clientX, e.evt.clientY, stage, selectId.value, layer)
             }
         })
 
     })
 
     emitter.on('save', (event) => {
-        console.log('save')
-        console.log(stage.toObject())
     })
 
+    emitter.on('preview', (event) => {
+    })
+
+    emitter.on('changeWidthAndHeight', (event) => {
+    })
 })
 
 //更新css
@@ -105,7 +110,8 @@ function _updateCss(css) {
         }
 
     } else {
-        selectNode.setAttrs({ ...css })
+        selectNode.setAttrs({...css})
+        layer.draw();
     }
 
 }
@@ -159,10 +165,16 @@ const addComponent = async (event) => {
             useConnectLine(x, y, dashboardRect.value.width, dashboardRect.value.height, layer, stage)
         }
 
-        if(iconTitle === '时间'){
-            const { clock } = useClock(x, y, dashboardRect.value.width, dashboardRect.value.height,layer,stage)
+        if (iconTitle === '时间') {
+            const { clock } = useClock(x, y, dashboardRect.value.width, dashboardRect.value.height, layer, stage)
             layer.add(clock[iconName]);
-            setInterval(clock[iconName].updateClock.bind(clock[iconName]),1000) 
+            setInterval(clock[iconName].updateClock.bind(clock[iconName]), 1000)
+            layer.draw();
+        }
+
+        if(iconTitle === '采暖系统'){
+            const { customImage } = useHeatingSystem(x, y, dashboardRect.value.width, dashboardRect.value.height, layer, stage, iconName)
+            layer.add(customImage);
             layer.draw();
         }
 
@@ -202,8 +214,15 @@ const addComponent = async (event) => {
 
 <style scoped lang="scss">
 #dashboard {
-    height: calc(100vh - 50px);
-    width: calc(100vw - 280px);
+    flex-grow: 1;
+    overflow: auto; /* 出现滚动条 */
+    box-sizing: border-box;
+    background-color: #f0f0f0;
+    background-image:
+        linear-gradient(#e5e5e5 1px, transparent 1px),
+        linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+    background-size: 20px 20px;
     position: relative;
 }
+
 </style>

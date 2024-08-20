@@ -180,13 +180,43 @@ export const leftIconListStore = defineStore('leftIconList', {
                             'icon': 'icon-dianzishizhong',
                             'choice': false
                         },
+                    ],
+                },
+                {
+                    title: '采暖系统',
+                    normalIcon: [
                         {
-                            'name': 'clockFace',
-                            'icon': 'icon-shizhong',
+                            'name': 'heatingSystemPump',
+                            'icon': 'icon-shuibeng',
+                            'choice': false
+                        },
+                        {
+                            'name': 'heatingSystemWaterTreatment',
+                            'icon': 'icon-shuichuliyi',
+                            'choice': false
+                        },
+                        {
+                            'name': 'heatingSystemWaterPressureSensor',
+                            'icon': 'icon-huaban',
+                            'choice': false
+                        },
+                        {
+                            'name': 'heatingSystemWaterTemperatrueSensor',
+                            'icon': 'icon-wenduchuanganqi',
+                            'choice': false
+                        },
+                        {
+                            'name': 'heatingSystemAirCondition',
+                            'icon': 'icon-kongtiao',
+                            'choice': false
+                        },
+                        {
+                            'name': 'heatingSystemElectricBoiler',
+                            'icon': 'icon-dianguolu_huaban',
                             'choice': false
                         },
                     ],
-                }
+                },
             ]
 
         }

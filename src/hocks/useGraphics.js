@@ -12,7 +12,7 @@ export function useGraphics(x, y, width, height) {
         fill: '#ffffff',
         stroke: '#000000',
         strokeWidth: 2,
-        cornerRadius: 0,
+        cornerRadius: 4,
         draggable: true,
         strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
         dragBoundFunc: function (pos) {

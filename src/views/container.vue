@@ -3,7 +3,7 @@
         <TopMenu />
         <div class="content">
             <LeftMenu />
-            <Dashboard />
+            <Dashboard/>
         </div>
     </div>
 </template>
@@ -15,16 +15,15 @@ import TopMenu from '../components/TopMenu.vue';
 </script>
 
 <style scoped lang="scss">
-
-#container{
+#container {
     width: 100%;
     height: 100%;
 }
 
-.content{
+.content {
     height: calc(100% - 50px);
     width: 100%;
     display: flex;
+    flex-direction: row;
 }
-
 </style>
