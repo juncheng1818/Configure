@@ -16,26 +16,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
         dragBoundFunc: function (pos) {
-
-            //放大或者缩小之后的宽高
-            const newWidth = rect.width() * rect.scaleX();
-            const newHeight = rect.height() * rect.scaleY();
-
-            var newX = pos.x <= 0 ? 0 : pos.x;
-            var newY = pos.y <= 0 ? 0 : pos.y;
-
-            if (newX + newWidth > width) {
-                newX = width - newWidth;
-            }
-
-            if (newY + newHeight > height) {
-                newY = height - newHeight;
-            }
-
-            return {
-                x: newX,
-                y: newY
-            }
         },
     });
 
@@ -52,29 +32,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
         dragBoundFunc: function (pos) {
-            // 放大或缩小后的半径
-            const newRadius = circle.radius() * circle.scaleX();
-
-            let newX = pos.x;
-            let newY = pos.y;
-
-            if (newX - newRadius < 0) {
-                newX = newRadius;
-            }
-            if (newY - newRadius < 0) {
-                newY = newRadius;
-            }
-            if (newX + newRadius > width) {
-                newX = width - newRadius;
-            }
-            if (newY + newRadius > height) {
-                newY = height - newRadius;
-            }
-
-            return {
-                x: newX,
-                y: newY,
-            };
         },
     });
 
@@ -135,20 +92,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-
-            // 获取三角形的包围盒
-            var boundingBox = this.getClientRect({ relativeTo: stage });
-            // 计算三角形相对于其自身原点的偏移
-            var offsetX = boundingBox.x - this.x();
-            var offsetY = boundingBox.y - this.y();
-            // 计算新的位置，确保包围盒完全在舞台内
-            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
-            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -167,26 +110,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            // 获取箭头当前宽度和高度
-            const newWidth = arrow.width() * arrow.scaleX();
-            const newHeight = arrow.height() * arrow.scaleY();
-
-            // 计算箭头的边界
-            let newX = pos.x <= 0 ? 0 : pos.x;
-            let newY = pos.y <= 0 ? 0 : pos.y;
-
-            if (newX + newWidth > width) {
-                newX = width - newWidth;
-            }
-
-            if (newY + newHeight > width) {
-                newY = width - newHeight;
-            }
-
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -205,31 +128,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            // 计算星星的边界
-            let newX = pos.x;
-            let newY = pos.y;
-
-            // 左边界
-            if (newX - star.outerRadius() * star.scaleX() < 0) {
-                newX = star.outerRadius() * star.scaleX();
-            }
-            // 右边界
-            if (newX + star.outerRadius() * star.scaleX() > width) {
-                newX = width - star.outerRadius() * star.scaleX();
-            }
-            // 上边界
-            if (newY - star.outerRadius() * star.scaleY() < 0) {
-                newY = star.outerRadius() * star.scaleY();
-            }
-            // 下边界
-            if (newY + star.outerRadius() * star.scaleY() > height) {
-                newY = height - star.outerRadius() * star.scaleY();
-            }
-
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -247,20 +145,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-
-            // 获取三角形的包围盒
-            var boundingBox = this.getClientRect({ relativeTo: stage });
-            // 计算三角形相对于其自身原点的偏移
-            var offsetX = boundingBox.x - this.x();
-            var offsetY = boundingBox.y - this.y();
-            // 计算新的位置，确保包围盒完全在舞台内
-            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
-            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -281,18 +165,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-
-            var boundingBox = this.getClientRect({ relativeTo: stage });
-            var offsetX = boundingBox.x - this.x();
-            var offsetY = boundingBox.y - this.y();
-            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
-            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
-
-            return {
-                x: newX,
-                y: newY
-            };
         }
     });
 
@@ -310,20 +182,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-
-            // 获取三角形的包围盒
-            var boundingBox = this.getClientRect({ relativeTo: stage });
-            // 计算三角形相对于其自身原点的偏移
-            var offsetX = boundingBox.x - this.x();
-            var offsetY = boundingBox.y - this.y();
-            // 计算新的位置，确保包围盒完全在舞台内
-            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
-            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -341,20 +199,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-
-            // 获取三角形的包围盒
-            var boundingBox = this.getClientRect({ relativeTo: stage });
-            // 计算三角形相对于其自身原点的偏移
-            var offsetX = boundingBox.x - this.x();
-            var offsetY = boundingBox.y - this.y();
-            // 计算新的位置，确保包围盒完全在舞台内
-            var newX = Math.max(-offsetX, Math.min(pos.x, stage.width() - boundingBox.width - offsetX));
-            var newY = Math.max(-offsetY, Math.min(pos.y, stage.height() - boundingBox.height - offsetY));
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -373,18 +217,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-            var scale = this.scaleX(); // 假设 x 和 y 的缩放比例相同
-            var outerRadius = this.outerRadius() * scale;
-
-            // 计算新的位置，确保整个环都在舞台内
-            var newX = Math.max(outerRadius, Math.min(pos.x, stage.width() - outerRadius));
-            var newY = Math.max(outerRadius, Math.min(pos.y, stage.height() - outerRadius));
-
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -404,18 +236,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-            var scale = this.scaleX(); // 假设 x 和 y 的缩放比例相同
-            var outerRadius = this.outerRadius() * scale;
-
-            // 计算新的位置，确保整个弧形都在舞台内
-            var newX = Math.max(outerRadius, Math.min(pos.x, stage.width() - outerRadius));
-            var newY = Math.max(outerRadius, Math.min(pos.y, stage.height() - outerRadius));
-
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 
@@ -432,16 +252,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,
         dragBoundFunc: function (pos) {
-            var stage = this.getStage();
-            // 获取文本的边界框
-            var textBox = this.getClientRect({relativeTo: stage});
-            // 计算新的位置，确保文本不会超出舞台边界
-            var newX = Math.max(0, Math.min(pos.x, stage.width() - textBox.width));
-            var newY = Math.max(0, Math.min(pos.y, stage.height() - textBox.height));
-            return {
-                x: newX,
-                y: newY
-            };
         },
     });
 

@@ -1,3 +1,4 @@
+<!-- 右击菜单 -->
 <template>
     <div v-if="visible" :style="menuStyle" class="context-menu">
         <ul>

@@ -2,6 +2,7 @@ export const pieOptions = {
     tooltip: {
         trigger: 'item'
     },
+    backgroundColor: 'transparent',
     series: [
         {
             name: '访问来源',
@@ -19,6 +20,13 @@ export const pieOptions = {
 }
 
 export const lineOptions = {
+    grid: {
+        left: '10%',
+        right: '10%',
+        top: '10%',
+        bottom: '10%',
+        containLabel: true
+    },
     xAxis: {
         type: 'category',
         data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -35,6 +43,13 @@ export const lineOptions = {
 }
 
 export const barOptions = {
+    grid: {
+        left: '10%',
+        right: '10%',
+        top: '10%',
+        bottom: '10%',
+        containLabel: true
+    },
     xAxis: {
         type: 'category',
         data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
