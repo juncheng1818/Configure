@@ -1,220 +1,349 @@
 export function useConnectLine(x, y, width, height, layer, stage) {
-    let timestamp = Date.now();
+    const timestamp = Date.now();
+    
+    // 默认配置
+    const defaultConfig = {
+        frameDuration: 22,
+        mainLineStroke: 'lightblue',
+        mainLineWidth: 7,
+        animatedLineStroke: '#18a058',
+        animatedLineWidth: 3,
+        anchorRadius: 5,
+        anchorFill: '#18a058',
+        dashPattern: [10, 10],
+        opacity: 0.6
+    };
 
     // 创建一个组来包含所有元素
     const group = new Konva.Group({
         name: 'connect-line-group',
         id: `connect-line-group-${timestamp}`,
-        draggable: true, // 启用group的拖拽
+        draggable: true,
         x: x,
         y: y,
-        // 阻止 Transformer 触发的关键属性
-        listening: true,  // 确保组响应事件
+        listening: true,
     });
 
-    // 使用 Konva 的 setAttr 方法来设置自定义属性
+    // 设置自定义属性
     group.setAttr('customAttrs', {
         animation: null,
-        frameDuration: 22
+        frameDuration: defaultConfig.frameDuration,
+        config: defaultConfig
     });
 
-    const linePoints = [
-        0, 0,      // 相对于 group 的 (0, 0)
-        50, 0,    // 相对于 group 的 (50, 0)
-        100, 0,    // 相对于 group 的 (100, 0)
-        150, 0,    // 相对于 group 的 (150, 0)
-        200, 0     // 相对于 group 的 (200, 0)
-    ];
+    // 默认连线点
+    const defaultLinePoints = [0, 0, 50, 0, 100, 0, 150, 0, 200, 0];
 
-    // 创建主线并初始化五个点
+    // 创建主线
     const mainLine = new Konva.Line({
         name: 'connect-line',
         id: `connect-line-${timestamp}`,
-        points: linePoints,
-        stroke: 'lightblue',
-        strokeWidth: 7,
+        points: defaultLinePoints,
+        stroke: defaultConfig.mainLineStroke,
+        strokeWidth: defaultConfig.mainLineWidth,
         lineCap: 'round',
         lineJoin: 'round',
-        listening: true,  // 确保主线响应事件
-        draggable: false, // 禁用单独拖拽
+        listening: true,
+        draggable: false,
     });
 
-    group.add(mainLine);
-
-    // 创建动画线，禁用事件监听
+    // 创建动画线
     const animatedLine = new Konva.Line({
         name: 'connect-line-animated',
         id: `connect-line-animated-${timestamp}`,
-        points: mainLine.points(),
-        stroke: '#18a058',
-        strokeWidth: 3,
+        points: defaultLinePoints,
+        stroke: defaultConfig.animatedLineStroke,
+        strokeWidth: defaultConfig.animatedLineWidth,
         lineCap: 'round',
         lineJoin: 'round',
-        dash: [10, 10],
-        opacity: 0.6,
-        listening: false, // 确保动画线响应事件
-        draggable: false, // 禁用单独拖拽
+        dash: defaultConfig.dashPattern,
+        opacity: defaultConfig.opacity,
+        listening: false,
+        draggable: false,
     });
 
+    group.add(mainLine);
     group.add(animatedLine);
 
-    // 创建动画的函数
-    function createAnimation() {
-        const customAttrs = group.getAttr('customAttrs') || {};
-        if (customAttrs.animation) {
-            customAttrs.animation.stop();
+    // 动画管理类
+    class AnimationManager {
+        constructor(group, animatedLine, layer) {
+            this.group = group;
+            this.animatedLine = animatedLine;
+            this.layer = layer;
         }
 
-        customAttrs.animation = new Konva.Animation(function (frame) {
-            const dashOffset = -frame.time / customAttrs.frameDuration;
-            animatedLine.dashOffset(dashOffset);
-        }, layer);
+        createAnimation() {
+            try {
+                const customAttrs = this.group.getAttr('customAttrs') || {};
+                
+                // 停止现有动画
+                if (customAttrs.animation) {
+                    customAttrs.animation.stop();
+                }
 
-        customAttrs.animation.start();
-        group.setAttr('customAttrs', customAttrs);
+                // 检查必要的对象是否存在
+                if (!this.animatedLine || !this.layer) {
+                    console.warn('动画对象不存在，跳过动画创建');
+                    return;
+                }
+
+                // 创建新动画
+                customAttrs.animation = new Konva.Animation((frame) => {
+                    if (this.animatedLine && frame) {
+                        const dashOffset = -frame.time / customAttrs.frameDuration;
+                        this.animatedLine.dashOffset(dashOffset);
+                    }
+                }, this.layer);
+
+                customAttrs.animation.start();
+                this.group.setAttr('customAttrs', customAttrs);
+            } catch (error) {
+                console.warn('创建动画时出错:', error);
+            }
+        }
+
+        changeFlowSpeed(newSpeed) {
+            const customAttrs = this.group.getAttr('customAttrs') || {};
+            customAttrs.frameDuration = Math.max(1, newSpeed); // 确保速度至少为1
+            this.group.setAttr('customAttrs', customAttrs);
+            this.createAnimation();
+        }
+
+        stopAnimation() {
+            try {
+                const customAttrs = this.group.getAttr('customAttrs') || {};
+                if (customAttrs.animation) {
+                    customAttrs.animation.stop();
+                    customAttrs.animation = null;
+                    this.group.setAttr('customAttrs', customAttrs);
+                }
+            } catch (error) {
+                console.warn('停止动画时出错:', error);
+            }
+        }
+
+        startAnimation() {
+            this.createAnimation();
+        }
+
+        isRunning() {
+            const customAttrs = this.group.getAttr('customAttrs') || {};
+            return customAttrs.animation ? customAttrs.animation.isRunning() : false;
+        }
     }
 
+    // 创建动画管理器
+    const animationManager = new AnimationManager(group, animatedLine, layer);
+    
     // 初始创建动画
-    createAnimation();
+    animationManager.createAnimation();
 
-    // 添加一个用于改变流速的函数
-    function changeFlowSpeed(newSpeed) {
+    // 将方法绑定到group
+    group.changeFlowSpeed = (newSpeed) => animationManager.changeFlowSpeed(newSpeed);
+    group.getAnimation = () => animationManager;
+    group.getFrameDuration = () => {
         const customAttrs = group.getAttr('customAttrs') || {};
-        customAttrs.frameDuration = newSpeed;
-        group.setAttr('customAttrs', customAttrs);
-        createAnimation();
-    }
-
-    // 将 changeFlowSpeed 函数添加为 group 的方法
-    group.changeFlowSpeed = changeFlowSpeed;
-
-    // 添加一个方法来安全地获取 animation
-    group.getAnimation = function () {
-        const customAttrs = this.getAttr('customAttrs');
-        return customAttrs ? customAttrs.animation : null;
-    };
-
-    group.getFrameDuration = function () {
-        const customAttrs = this.getAttr('customAttrs') || {};
         return customAttrs.frameDuration;
     };
 
-    // 保存锚点位置
-    let savedAnchors = [];
+    // 锚点管理类
+    class AnchorManager {
+        constructor(group, mainLine, animatedLine, layer, timestamp, config) {
+            this.group = group;
+            this.mainLine = mainLine;
+            this.animatedLine = animatedLine;
+            this.layer = layer;
+            this.timestamp = timestamp;
+            this.config = config;
+            this.anchors = [];
+            this.savedAnchors = [];
+        }
 
-    // 添加锚点函数
-    function addAnchor(x, y) {
-        const anchor = new Konva.Circle({
-            name: 'connect-line-anchor',
-            id: `connect-line-anchor-${timestamp}`,
-            x: x,
-            y: y,
-            radius: 5,
-            fill: '#18a058',
-            draggable: true,
-            listening: true, // 确保锚点响应事件
-        });
+        addAnchor(x, y) {
+            const anchor = new Konva.Circle({
+                name: 'connect-line-anchor',
+                id: `connect-line-anchor-${this.timestamp}-${Date.now()}`,
+                x: x,
+                y: y,
+                radius: this.config.anchorRadius,
+                fill: this.config.anchorFill,
+                draggable: true,
+                listening: true,
+            });
 
-        group.add(anchor);
+            this.group.add(anchor);
 
-        anchor.on('dragmove', function (e) {
-            updateLine();
-            e.cancelBubble = true; // 防止事件冒泡到组
-        });
+            // 绑定事件
+            anchor.on('dragmove', (e) => {
+                this.updateLine();
+                e.cancelBubble = true;
+            });
 
-        // 双击删除锚点
-        anchor.on('dblclick', function (e) {
-            e.cancelBubble = true; // 防止事件冒泡到组
-            anchors = anchors.filter(a => a !== anchor);
+            anchor.on('dblclick', (e) => {
+                e.cancelBubble = true;
+                this.removeAnchor(anchor);
+            });
+
+            this.anchors.push(anchor);
+            return anchor;
+        }
+
+        removeAnchor(anchor) {
+            this.anchors = this.anchors.filter(a => a !== anchor);
             anchor.destroy();
-            updateLine();
-            layer.draw();
-        });
+            this.updateLine();
+            this.layer.draw();
+        }
 
-        return anchor;
-    }
+        updateLine() {
+            const points = [];
+            this.anchors.forEach(anchor => {
+                points.push(anchor.x());
+                points.push(anchor.y());
+            });
+            
+            if (points.length > 0) {
+                this.mainLine.points(points);
+                this.animatedLine.points(points);
+            }
+        }
 
-    // 更新线的点
-    function updateLine() {
-        const points = [];
-        anchors.forEach(anchor => {
-            points.push(anchor.x());
-            points.push(anchor.y());
-        });
-        if (points.length > 0) {
-            mainLine.points(points);
-            animatedLine.points(points);
+        saveAnchors() {
+            this.savedAnchors = this.anchors.map(anchor => ({
+                x: anchor.x(),
+                y: anchor.y()
+            }));
+        }
+
+        restoreAnchors() {
+            this.savedAnchors.forEach(pos => {
+                this.addAnchor(pos.x, pos.y);
+            });
+            this.updateLine();
+        }
+
+        clearAnchors() {
+            this.anchors.forEach(anchor => anchor.destroy());
+            this.anchors = [];
+        }
+
+        initializeFromPoints(points) {
+            for (let i = 0; i < points.length; i += 2) {
+                this.addAnchor(points[i], points[i + 1]);
+            }
         }
     }
+
+    // 创建锚点管理器
+    const anchorManager = new AnchorManager(group, mainLine, animatedLine, layer, timestamp, defaultConfig);
 
     // 初始化锚点
-    let anchors = mainLine.points().reduce((acc, _, i, arr) => {
-        if (i % 2 === 0) {
-            acc.push(addAnchor(arr[i], arr[i + 1]));
-        }
-        return acc;
-    }, []);
+    anchorManager.initializeFromPoints(defaultLinePoints);
 
-    // 处理画布点击事件，消除锚点
-    stage.on('click', function (e) {
-        if (e.target === stage) {
-            // 点击画布时移除所有锚点并保存位置
-            if (anchors.length > 0) {
-                savedAnchors = anchors.map(anchor => ({
-                    x: anchor.x(),
-                    y: anchor.y()
-                }));
-                anchors.forEach(anchor => anchor.destroy());
-                anchors = [];
-            }
-            layer.draw();
+    // 事件处理器类
+    class EventHandler {
+        constructor(stage, layer, group, mainLine, anchorManager) {
+            this.stage = stage;
+            this.layer = layer;
+            this.group = group;
+            this.mainLine = mainLine;
+            this.anchorManager = anchorManager;
+            this.setupEvents();
         }
-    });
 
-    mainLine.on('click', function (e) {
-        e.cancelBubble = true;  // 防止事件传播到画布
-        // 恢复锚点显示逻辑
-        if (anchors.length === 0) {
-            savedAnchors.forEach(pos => {
-                anchors.push(addAnchor(pos.x, pos.y));
+        setupEvents() {
+            // 画布点击事件 - 隐藏锚点
+            this.stage.on('click', (e) => {
+                if (e.target === this.stage) {
+                    this.anchorManager.saveAnchors();
+                    this.anchorManager.clearAnchors();
+                    this.layer.draw();
+                }
             });
-            updateLine();
-            layer.draw();
+
+            // 主线点击事件 - 显示锚点
+            this.mainLine.on('click', (e) => {
+                e.cancelBubble = true;
+                if (this.anchorManager.anchors.length === 0) {
+                    this.anchorManager.restoreAnchors();
+                    this.layer.draw();
+                }
+            });
+
+            // 组点击事件 - 防止事件冒泡
+            this.group.on('click', (e) => {
+                e.cancelBubble = true;
+            });
+
+            // 双击添加锚点
+            this.group.on('dblclick', (e) => {
+                const pos = this.group.getRelativePointerPosition();
+                if (pos) {
+                    this.addAnchorAtPosition(pos.x, pos.y);
+                    this.layer.draw();
+                }
+                e.cancelBubble = true;
+            });
         }
-    });
 
-    // 防止事件冒泡到组
-    group.on('click', function (e) {
-        e.cancelBubble = true;  // 防止事件冒泡并触发Transformer
-    });
+        addAnchorAtPosition(x, y) {
+            const newAnchor = this.anchorManager.addAnchor(x, y);
+            
+            // 将新锚点插入到适当位置（按x坐标排序）
+            const anchors = this.anchorManager.anchors;
+            const sortedAnchors = anchors.sort((a, b) => a.x() - b.x());
+            
+            // 重新设置anchors数组
+            this.anchorManager.anchors = sortedAnchors;
+            this.anchorManager.updateLine();
+        }
 
-    // 双击添加锚点
-    group.on('dblclick', function (e) {
-        // 获取相对于group的鼠标位置
-        const pos = group.getRelativePointerPosition();
-        // 创建新的锚点（红点）
-        const newAnchor = addAnchor(pos.x, pos.y);
-        // 将新锚点插入到anchors数组中的适当位置
-        let insertIndex = 0;
-        for (let i = 0; i < anchors.length - 1; i++) {
-            const anchor1 = anchors[i];
-            const anchor2 = anchors[i + 1];
-            if (pos.x >= anchor1.x() && pos.x <= anchor2.x()) {
-                insertIndex = i + 1;
-                break;
+        destroy() {
+            try {
+                // 安全地移除事件监听器
+                if (this.stage && this.stage.off) {
+                    this.stage.off('click');
+                }
+                if (this.mainLine && this.mainLine.off) {
+                    this.mainLine.off('click');
+                }
+                if (this.group && this.group.off) {
+                    this.group.off('click');
+                    this.group.off('dblclick');
+                }
+            } catch (error) {
+                console.warn('清理事件监听器时出错:', error);
             }
         }
-        anchors.splice(insertIndex, 0, newAnchor);
-        updateLine();
-        layer.draw();
-        e.cancelBubble = true;
-    });
+    }
+
+    // 创建事件处理器
+    const eventHandler = new EventHandler(stage, layer, group, mainLine, anchorManager);
 
 
+    // 添加组到图层
     layer.add(group);
     layer.draw();
 
+    // 返回API对象
     return {
-        group, timestamp
+        group,
+        timestamp,
+        animationManager,
+        anchorManager,
+        eventHandler,
+        // 便捷方法
+        changeFlowSpeed: (speed) => animationManager.changeFlowSpeed(speed),
+        stopAnimation: () => animationManager.stopAnimation(),
+        startAnimation: () => animationManager.startAnimation(),
+        isAnimationRunning: () => animationManager.isRunning(),
+        // 清理方法
+        destroy: () => {
+            animationManager.stopAnimation();
+            anchorManager.clearAnchors();
+            eventHandler.destroy();
+            group.destroy();
+        }
     };
 }

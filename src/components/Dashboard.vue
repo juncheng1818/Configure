@@ -180,27 +180,47 @@ const chartInstances = ref([])
 
 // 保存Dashboard配置到本地
 const saveDashboardConfig = () => {
-    if (!stage) return
+    if (!stage || !layer) return
 
     try {
+        // 获取所有Group组件
+        const allGroups = stage.find('Group').filter(group => group && group.id)
+        
+        // 先收集连线组件的动画状态（在暂停动画之前）
+        const connectLineData = {}
+        allGroups.forEach(group => {
+            if (group.id() && group.id().includes('connect-line-group-')) {
+                const customAttrs = group.getAttr('customAttrs') || {}
+                const animationManager = group.getAnimation ? group.getAnimation() : null
+                let isRunning = false
+                if (animationManager && typeof animationManager.isRunning === 'function') {
+                    isRunning = animationManager.isRunning()
+                } else if (animationManager) {
+                    // 如果isRunning方法不存在，尝试直接检查customAttrs
+                    const customAttrs = group.getAttr('customAttrs') || {}
+                    isRunning = customAttrs.animation ? customAttrs.animation.isRunning() : false
+                }
+                
+                connectLineData[group.id()] = {
+                    frameDuration: customAttrs.frameDuration || 22,
+                    animationRunning: isRunning
+                }
+            }
+        })
+        
+        // 暂停所有动画，避免保存时的状态冲突
+        allGroups.forEach(group => {
+            if (group.getAnimation && typeof group.getAnimation === 'function') {
+                const animationManager = group.getAnimation()
+                if (animationManager && animationManager.stopAnimation) {
+                    animationManager.stopAnimation()
+                }
+            }
+        })
+
         // 使用Konva的内置方法保存Stage状态，但排除Transformer
         const stageData = stage.toJSON()
         
-        // 从保存的数据中移除所有Transformer节点
-        if (stageData.children && stageData.children.length > 0) {
-            const layerData = stageData.children[0]
-            if (layerData && layerData.children) {
-                layerData.children = layerData.children.filter(child => {
-                    // 排除Transformer节点
-                    if (child.className === 'Transformer') {
-                        console.log('排除Transformer节点:', child.id)
-                        return false
-                    }
-                    return true
-                })
-            }
-        }
-
         // 收集ECharts图表数据
         const echartsData = {}
         chartInstances.value.forEach(chartInstance => {
@@ -216,11 +236,23 @@ const saveDashboardConfig = () => {
         const config = {
             stageData: stageData,
             echartsData: echartsData,
+            connectLineData: connectLineData,
             timestamp: Date.now()
         }
 
         // 保存到localStorage
         localStorage.setItem('dashboard-config', JSON.stringify(config))
+        
+        // 重新启动动画
+        allGroups.forEach(group => {
+            if (group.getAnimation && typeof group.getAnimation === 'function') {
+                const animationManager = group.getAnimation()
+                if (animationManager && animationManager.startAnimation) {
+                    animationManager.startAnimation()
+                }
+            }
+        })
+        
         message.success('配置已保存到本地')
         console.log('Dashboard配置已保存:', config)
         console.log('Stage数据结构:', stageData)
@@ -307,6 +339,15 @@ const loadDashboardConfig = () => {
             Object.keys(config.echartsData).forEach(timestamp => {
                 const echartsInfo = config.echartsData[timestamp]
                 restoreEChartsChart(timestamp, echartsInfo)
+            })
+        }
+
+        // 恢复连线组件的动画状态
+        if (config.connectLineData) {
+            Object.keys(config.connectLineData).forEach(groupId => {
+                const connectLineInfo = config.connectLineData[groupId]
+                console.log('恢复连线动画11111111:', connectLineInfo)
+                restoreConnectLineAnimation(groupId, connectLineInfo)
             })
         }
 
@@ -402,6 +443,116 @@ const restoreEChartsChart = (timestamp, echartsInfo) => {
 
     // 初始更新位置
     updatePosition()
+}
+
+// 恢复连线组件的动画状态
+const restoreConnectLineAnimation = (groupId, connectLineInfo) => {
+    console.log('恢复连线动画:', groupId, connectLineInfo)
+    
+    const group = stage.findOne(`#${groupId}`)
+    if (!group) {
+        console.log('未找到Group:', groupId)
+        return
+    }
+
+    console.log('找到Group:', group)
+
+    // 获取动画管理器
+    const animationManager = group.getAnimation ? group.getAnimation() : null
+    console.log('动画管理器:', animationManager)
+    
+    if (!animationManager) {
+        console.log('动画管理器不存在，尝试重新创建')
+        // 如果动画管理器不存在，尝试重新创建
+        const allLines = group.find('Line').filter(line => line && line.id)
+        const animatedLine = allLines.find(line => 
+            line.id() && line.id().includes('connect-line-animated-')
+        )
+        
+        if (animatedLine) {
+            console.log('找到动画线，重新创建动画管理器')
+            console.log('动画线:', animatedLine)
+            
+            // 设置动画参数
+            const customAttrs = group.getAttr('customAttrs') || {}
+            customAttrs.frameDuration = connectLineInfo.frameDuration || 22
+            group.setAttr('customAttrs', customAttrs)
+            
+            // 创建便捷方法对象（模拟useConnectLine.js返回的API）
+            const connectLineAPI = {
+                startAnimation: () => {
+                    try {
+                        const customAttrs = group.getAttr('customAttrs') || {};
+                        console.log('customAttrs:', customAttrs)
+                        
+                        // 停止现有动画
+                        if (customAttrs.animation) {
+                            customAttrs.animation.stop();
+                        }
+
+                        // 检查必要的对象是否存在
+                        if (!animatedLine || !layer) {
+                            console.warn('动画对象不存在，跳过动画创建');
+                            return;
+                        }
+
+                        // 创建新动画
+                        customAttrs.animation = new Konva.Animation((frame) => {
+                            if (animatedLine && frame) {
+                                const dashOffset = -frame.time / customAttrs.frameDuration;
+                                animatedLine.dashOffset(dashOffset);
+                            }
+                        }, layer);
+
+                        customAttrs.animation.start();
+                        group.setAttr('customAttrs', customAttrs);
+                    } catch (error) {
+                        console.warn('创建动画时出错:', error);
+                    }
+                },
+                stopAnimation: () => {
+                    try {
+                        const customAttrs = group.getAttr('customAttrs') || {};
+                        if (customAttrs.animation) {
+                            customAttrs.animation.stop();
+                            customAttrs.animation = null;
+                            group.setAttr('customAttrs', customAttrs);
+                        }
+                    } catch (error) {
+                        console.warn('停止动画时出错:', error);
+                    }
+                },
+                isAnimationRunning: () => {
+                    const customAttrs = group.getAttr('customAttrs') || {};
+                    return customAttrs.animation ? customAttrs.animation.isRunning() : false;
+                }
+            }
+            
+            // 将便捷方法绑定到group
+            group.getAnimation = () => connectLineAPI
+            
+            // 恢复动画状态
+            // if (connectLineInfo.animationRunning) {
+                connectLineAPI.startAnimation()
+                console.log('重新启动动画')
+            // }
+        }
+        return
+    }
+
+    // 设置动画参数
+    const customAttrs = group.getAttr('customAttrs') || {}
+    customAttrs.frameDuration = connectLineInfo.frameDuration || 22
+    group.setAttr('customAttrs', customAttrs)
+
+    // 恢复动画状态
+    if (connectLineInfo.animationRunning) {
+        animationManager.startAnimation()
+        console.log('启动动画')
+    } else {
+        animationManager.stopAnimation()
+        console.log('停止动画')
+    }
 }
 
 // 更新所有ECharts容器的位置
