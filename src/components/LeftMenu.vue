@@ -44,7 +44,7 @@ const iconClick = (title, data) => {
     width: 240px;
     padding: 15px;
     border-top: 1px solid #dddddd80;
-    background-color: #00000010;
+    background-color: #ffffff90;
     flex-shrink: 0;
 }
 

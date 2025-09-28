@@ -49,30 +49,6 @@ export function useGraphics(x, y, width, height) {
         draggable: true,
         strokeScaleEnabled: false,  // 禁用缩放时的边框缩放
         dragBoundFunc: function (pos) {
-            // 放大或缩小后的宽高
-            const newRadiusX = oval.radiusX() * oval.scaleX();
-            const newRadiusY = oval.radiusY() * oval.scaleY();
-
-            let newX = pos.x;
-            let newY = pos.y;
-
-            if (newX - newRadiusX < 0) {
-                newX = newRadiusX;
-            }
-            if (newY - newRadiusY < 0) {
-                newY = newRadiusY;
-            }
-            if (newX + newRadiusX > width) {
-                newX = width - newRadiusX;
-            }
-            if (newY + newRadiusY > height) {
-                newY = height - newRadiusY;
-            }
-
-            return {
-                x: newX,
-                y: newY,
-            };
         },
     });
 
