@@ -1024,13 +1024,24 @@ export class ConnectLineConfigManager {
         const mainLine = group.findOne('.connect-line');
         const currentPoints = mainLine ? mainLine.points() : [];
         
-        // 找到插入位置（基于x坐标）
-        let insertIndex = 0;
-        for (let i = 0; i < currentPoints.length; i += 2) {
-            if (x > currentPoints[i]) {
+        // 找到插入位置（基于距离连线的最近点）
+        let insertIndex = currentPoints.length; // 默认插入到末尾
+        let minDistance = Infinity;
+        
+        // 遍历连线的每个线段，找到距离新点最近的线段
+        for (let i = 0; i < currentPoints.length - 2; i += 2) {
+            const x1 = currentPoints[i];
+            const y1 = currentPoints[i + 1];
+            const x2 = currentPoints[i + 2];
+            const y2 = currentPoints[i + 3];
+            
+            // 计算点到线段的距离
+            const distance = this._pointToLineDistance(x, y, x1, y1, x2, y2);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                // 插入到当前线段的结束位置
                 insertIndex = i + 2;
-            } else {
-                break;
             }
         }
         
@@ -1071,5 +1082,40 @@ export class ConnectLineConfigManager {
         anchorManager.anchors = newAnchors;
         
         console.log('添加锚点成功，新连线形状:', newPoints);
+    }
+
+    // 计算点到线段的距离
+    _pointToLineDistance(px, py, x1, y1, x2, y2) {
+        const A = px - x1;
+        const B = py - y1;
+        const C = x2 - x1;
+        const D = y2 - y1;
+
+        const dot = A * C + B * D;
+        const lenSq = C * C + D * D;
+        
+        if (lenSq === 0) {
+            // 线段退化为点
+            return Math.sqrt(A * A + B * B);
+        }
+        
+        let param = dot / lenSq;
+        
+        let xx, yy;
+        
+        if (param < 0) {
+            xx = x1;
+            yy = y1;
+        } else if (param > 1) {
+            xx = x2;
+            yy = y2;
+        } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+        }
+        
+        const dx = px - xx;
+        const dy = py - yy;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 }
