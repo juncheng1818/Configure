@@ -510,6 +510,12 @@ export class ConnectLineConfigManager {
         customAttrs.frameDuration = connectLineInfo.frameDuration || 22;
         group.setAttr('customAttrs', customAttrs);
 
+        // 重新绑定getFrameDuration方法
+        group.getFrameDuration = () => {
+            const customAttrs = group.getAttr('customAttrs') || {};
+            return customAttrs.frameDuration;
+        };
+
         // 恢复动画状态
         if (connectLineInfo.animationRunning) {
             animationManager.startAnimation();
@@ -586,6 +592,12 @@ export class ConnectLineConfigManager {
             
             // 将便捷方法绑定到group
             group.getAnimation = () => connectLineAPI;
+            
+            // 重新绑定getFrameDuration方法
+            group.getFrameDuration = () => {
+                const customAttrs = group.getAttr('customAttrs') || {};
+                return customAttrs.frameDuration;
+            };
             
             // 恢复动画状态
             connectLineAPI.startAnimation();

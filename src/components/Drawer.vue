@@ -56,24 +56,39 @@ const showDrawer = (stage, selectId) => {
         let group = stage.findOne(`#connect-line-group-${timestamp}`)
         let mainLine = stage.findOne(`#connect-line-${timestamp}`)
         let animatedLine = stage.findOne(`#connect-line-animated-${timestamp}`)
-        let anchor = stage.findOne(`#connect-line-anchor-${timestamp}`)
+        
+        // 安全地获取锚点信息
+        let anchorFill = '#18a058'; // 默认颜色
+        if (selectId.includes('connect-line-anchor')) {
+            // 如果是锚点，直接获取其属性
+            let anchor = stage.findOne(`#${selectId}`)
+            if (anchor && anchor.fill) {
+                anchorFill = anchor.fill();
+            }
+        } else {
+            // 如果是连线组件，获取第一个锚点的颜色作为默认值
+            let anchors = group ? group.find('.connect-line-anchor') : [];
+            if (anchors && anchors.length > 0 && anchors[0].fill) {
+                anchorFill = anchors[0].fill();
+            }
+        }
+        
         formValue.value = {
             'id': selectId,
             'name': 'connect-line',
 
-            'x': group.x(),
-            'y': group.y(),
+            'x': group ? group.x() : 0,
+            'y': group ? group.y() : 0,
 
-            'mainLine-stroke': mainLine.stroke(),
-            'mainLine-strokeWidth': mainLine.strokeWidth(),
+            'mainLine-stroke': mainLine ? mainLine.stroke() : 'lightblue',
+            'mainLine-strokeWidth': mainLine ? mainLine.strokeWidth() : 7,
 
-            'animatedLine-stroke': animatedLine.stroke(),
-            'animatedLine-strokeWidth': animatedLine.strokeWidth(),
+            'animatedLine-stroke': animatedLine ? animatedLine.stroke() : '#18a058',
+            'animatedLine-strokeWidth': animatedLine ? animatedLine.strokeWidth() : 3,
 
-            // 'anchor-radius': anchor.radius(),
-            'anchor-fill': anchor.fill(),
+            'anchor-fill': anchorFill,
 
-            'FlowSpeed': group.getFrameDuration()
+            'FlowSpeed': group ? group.getFrameDuration() : 22
         }
     } else {
         var css = selectNode.getAttrs()

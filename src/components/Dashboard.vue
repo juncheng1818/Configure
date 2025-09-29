@@ -314,15 +314,9 @@ const loadDashboardConfig = () => {
             connectLineConfigManager.restoreAllConnectLineAnimations(config.connectLineData)
         }
 
-        stage.batchDraw()
-        
         // 更新缩放比例显示
         currentScale.value = Math.round(stage.scaleX() * 100)
         
-        // 隐藏所有Transformer（恢复配置后不应该显示控制点）
-        stage.find('Transformer').forEach(tr => {
-            tr.visible(false)
-        })
         stage.batchDraw()
         
         message.success('配置已加载')
@@ -332,6 +326,34 @@ const loadDashboardConfig = () => {
         message.error('加载失败: ' + error.message)
         console.error('加载配置失败:', error)
     }
+}
+
+// 为指定节点恢复Transformer
+const restoreTransformerForNode = (targetNode) => {
+    console.log(targetNode)
+    // 移除旧的非ECharts Transformer
+    stage.find('Transformer').forEach(tr => {
+        if (!tr.id() || !tr.id().includes('transformer-')) {
+            tr.destroy();
+        }
+    });
+
+    // 检查是否已经有Transformer绑定到这个节点
+    const existingTransformer = stage.find('Transformer').find(tr => 
+        tr.nodes().includes(targetNode)
+    );
+
+    if (!existingTransformer) {
+        // 创建新的 Transformer
+        const tr = new Konva.Transformer();
+        layer.add(tr);
+        tr.nodes([targetNode]);
+    } else {
+        // 显示现有的 Transformer
+        existingTransformer.visible(true);
+    }
+    
+    layer.draw();
 }
 
 // 恢复ECharts图表
@@ -527,21 +549,13 @@ onMounted(() => {
 
             // 检查是否是连线组件，如果是则不创建Transformer
             if (e.target.id() && e.target.id().includes('connect-line')) {
+                console.log(e.target)
                 return;
             }
+            
+            // 恢复Transformer（点击组件时）
+            restoreTransformerForNode(e.target);
 
-            // 移除旧的非ECharts Transformer
-            stage.find('Transformer').forEach(tr => {
-                if (!tr.id() || !tr.id().includes('transformer-')) {
-                    tr.destroy();
-                }
-            });
-
-            // 创建新的 Transformer
-            const tr = new Konva.Transformer();
-            layer.add(tr);
-            tr.nodes([e.target]);
-            layer.draw();
         });
 
     })
